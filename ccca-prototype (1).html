@@ -1,0 +1,4116 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CCCA 加中建筑协会 - 个人中心 Prototype</title>
+<style>
+/* SVG icon system - all icons inline, no external dependencies */
+.icon {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  vertical-align: -0.15em;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+:root {
+  --red: #C8102E;
+  --red-light: #FCE8EB;
+  --red-dark: #A00D26;
+  --gray-900: #2C2C2C;
+  --gray-600: #6B6B6B;
+  --gray-300: #E5E5E5;
+  --beige: #F5F1E8;
+  --white: #FFFFFF;
+  --green-bg: #EAF3DE;
+  --green-text: #3B6D11;
+  --amber-bg: #FAEEDA;
+  --amber-text: #854F0B;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", "Helvetica Neue", sans-serif;
+  background: var(--beige);
+  color: var(--gray-900);
+  font-size: 14px;
+  line-height: 1.5;
+  min-height: 100vh;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  background: none;
+  color: inherit;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* ============ View switcher (top right) ============ */
+.view-switcher {
+  position: fixed;
+  top: 12px;
+  right: 12px;
+  z-index: 1000;
+  background: var(--gray-900);
+  color: white;
+  padding: 6px;
+  border-radius: 24px;
+  display: flex;
+  gap: 4px;
+  font-size: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+.view-switcher button {
+  color: white;
+  padding: 6px 14px;
+  border-radius: 18px;
+  font-size: 12px;
+  transition: all 0.2s;
+}
+.view-switcher button.active {
+  background: var(--red);
+}
+
+/* ============ Mobile view ============ */
+.mobile-view {
+  display: none;
+}
+.mobile-frame {
+  max-width: 380px;
+  margin: 0 auto;
+  background: var(--beige);
+  min-height: 100vh;
+  position: relative;
+  padding-bottom: 70px;
+}
+
+.mobile-status-bar {
+  background: var(--beige);
+  padding: 10px 18px 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--gray-900);
+}
+.mobile-status-bar .icons {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+}
+
+.mobile-header {
+  background: white;
+  padding: 14px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 0.5px solid var(--gray-300);
+}
+.mobile-header .title {
+  font-size: 17px;
+  font-weight: 500;
+}
+.mobile-header .back {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+}
+.mobile-header .back i {
+  font-size: 22px;
+}
+
+.mobile-content {
+  padding: 14px;
+}
+
+.mobile-bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  max-width: 380px;
+  width: 100%;
+  background: white;
+  border-top: 0.5px solid var(--gray-300);
+  padding: 8px 0 18px;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  z-index: 100;
+}
+.mobile-bottom-nav .nav-item {
+  text-align: center;
+  flex: 1;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+.mobile-bottom-nav .nav-item:active {
+  opacity: 0.6;
+}
+.mobile-bottom-nav .nav-item i {
+  font-size: 22px;
+  color: var(--gray-600);
+}
+.mobile-bottom-nav .nav-item .label {
+  font-size: 10px;
+  color: var(--gray-600);
+  margin-top: 2px;
+}
+.mobile-bottom-nav .nav-item.active i,
+.mobile-bottom-nav .nav-item.active .label {
+  color: var(--red);
+}
+.mobile-bottom-nav .nav-item.active .label {
+  font-weight: 500;
+}
+
+/* ============ Desktop view ============ */
+.desktop-view {
+  display: none;
+  padding: 1rem;
+}
+
+.desktop-frame {
+  max-width: 1200px;
+  margin: 0 auto;
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 0.5px solid var(--gray-300);
+}
+
+.desktop-header {
+  background: white;
+  padding: 14px 28px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 0.5px solid var(--gray-300);
+}
+.desktop-header .nav-left {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+}
+.desktop-header .logo {
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--red);
+}
+.desktop-header .nav-left span:not(.logo) {
+  font-size: 13px;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+.desktop-header .nav-left span:not(.logo):hover {
+  color: var(--red);
+}
+.desktop-header .nav-right {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.desktop-header .nav-right .lang {
+  font-size: 12px;
+  color: var(--gray-600);
+}
+.desktop-header .avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--red);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 500;
+  color: white;
+}
+
+.desktop-body {
+  display: grid;
+  grid-template-columns: 230px 1fr;
+}
+
+.desktop-sidebar {
+  border-right: 0.5px solid var(--gray-300);
+  padding: 24px 0;
+}
+
+.sidebar-user-card {
+  padding: 16px 18px;
+  margin: 0 8px 12px;
+  background: white;
+  border: 0.5px solid var(--gray-300);
+  border-radius: 10px;
+}
+.sidebar-user-card .head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+.sidebar-user-card .avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: var(--red);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 500;
+  color: white;
+}
+.sidebar-user-card .name {
+  font-size: 14px;
+  font-weight: 500;
+}
+.sidebar-user-card .badge {
+  background: var(--red);
+  color: white;
+  font-size: 10px;
+  padding: 1px 7px;
+  border-radius: 8px;
+  font-weight: 500;
+}
+.sidebar-user-card .expiry {
+  font-size: 11px;
+  color: var(--gray-600);
+}
+
+.sidebar-section-label {
+  padding: 6px 14px;
+  font-size: 10px;
+  color: var(--gray-600);
+  margin-top: 14px;
+  letter-spacing: 0.5px;
+}
+
+.sidebar-item {
+  padding: 10px 22px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  transition: background 0.15s;
+  font-size: 13px;
+}
+.sidebar-item:hover {
+  background: var(--beige);
+}
+.sidebar-item i {
+  font-size: 18px;
+  color: var(--red);
+}
+.sidebar-item .badge-count {
+  margin-left: auto;
+  font-size: 10px;
+  background: var(--red-light);
+  padding: 1px 7px;
+  border-radius: 8px;
+  color: var(--red);
+  font-weight: 500;
+}
+.sidebar-item.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.sidebar-item.disabled i {
+  color: var(--gray-600);
+}
+.sidebar-item.active {
+  background: var(--red-light);
+  border-left: 3px solid var(--red);
+  margin: 0 8px;
+  border-radius: 0 6px 6px 0;
+  padding-left: 14px;
+}
+.sidebar-item.active span:not(.badge-count) {
+  color: var(--red);
+  font-weight: 500;
+}
+
+.desktop-main {
+  padding: 28px;
+}
+
+/* ============ Common card components ============ */
+.card-group {
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 0.5px solid var(--gray-300);
+  margin-bottom: 14px;
+}
+
+.card-row {
+  padding: 14px;
+  display: flex;
+  align-items: center;
+  border-bottom: 0.5px solid var(--gray-300);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.card-row:last-child {
+  border-bottom: none;
+}
+.card-row:active,
+.card-row:hover {
+  background: var(--beige);
+}
+.card-row.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.card-row.disabled:hover {
+  background: white;
+}
+
+.card-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: var(--red-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 12px;
+  flex-shrink: 0;
+}
+.card-icon i {
+  font-size: 22px;
+  color: var(--red);
+}
+.card-icon.gray {
+  background: var(--beige);
+}
+.card-icon.gray i {
+  color: var(--gray-600);
+}
+
+.card-content {
+  flex: 1;
+  min-width: 0;
+}
+.card-content .title {
+  font-size: 14px;
+  color: var(--gray-900);
+  font-weight: 500;
+}
+.card-content .subtitle {
+  font-size: 11px;
+  color: var(--gray-600);
+  margin-top: 2px;
+}
+.card-content .subtitle .highlight {
+  color: var(--red);
+  font-weight: 500;
+}
+
+.card-row > svg.chevron {
+  font-size: 18px;
+  color: var(--gray-600);
+}
+
+.section-label {
+  font-size: 11px;
+  color: var(--gray-600);
+  letter-spacing: 0.5px;
+  padding: 0 4px 8px;
+}
+
+/* ============ User profile card (top of mobile my account) ============ */
+.profile-card {
+  background: white;
+  border-radius: 14px;
+  padding: 16px;
+  border: 0.5px solid var(--gray-300);
+  margin-bottom: 14px;
+}
+.profile-card .row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.profile-card .avatar {
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  background: var(--red);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 17px;
+  font-weight: 500;
+  color: white;
+}
+.profile-card .info {
+  flex: 1;
+}
+.profile-card .name-line {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+.profile-card .name {
+  font-size: 16px;
+  font-weight: 500;
+}
+.profile-card .badge {
+  background: var(--red);
+  color: white;
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-weight: 500;
+}
+.profile-card .expiry {
+  font-size: 12px;
+  color: var(--gray-600);
+}
+.profile-card .renew-btn {
+  background: var(--red);
+  color: white;
+  font-size: 12px;
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-weight: 500;
+  transition: background 0.2s;
+}
+.profile-card .renew-btn:hover {
+  background: var(--red-dark);
+}
+
+/* ============ Quick action buttons ============ */
+.quick-actions {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.quick-actions button {
+  flex: 1;
+  padding: 11px;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  transition: all 0.2s;
+}
+.quick-actions button i {
+  font-size: 16px;
+}
+.quick-actions .primary {
+  background: var(--red);
+  color: white;
+}
+.quick-actions .primary:hover {
+  background: var(--red-dark);
+}
+.quick-actions .secondary {
+  background: white;
+  border: 0.5px solid var(--red);
+  color: var(--red);
+}
+.quick-actions .secondary:hover {
+  background: var(--red-light);
+}
+
+/* ============ Membership card (red banner) ============ */
+.membership-banner {
+  background: var(--red);
+  border-radius: 14px;
+  padding: 20px;
+  color: white;
+  margin-bottom: 14px;
+}
+.membership-banner .top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+.membership-banner .top i {
+  font-size: 22px;
+  color: white;
+}
+.membership-banner .level {
+  font-size: 18px;
+  font-weight: 500;
+}
+.membership-banner .status {
+  background: rgba(255,255,255,0.25);
+  color: white;
+  font-size: 10px;
+  padding: 2px 7px;
+  border-radius: 6px;
+  margin-left: auto;
+  font-weight: 500;
+}
+.membership-banner .expiry-block {
+  background: rgba(255,255,255,0.15);
+  border-radius: 10px;
+  padding: 14px;
+}
+.membership-banner .expiry-label {
+  font-size: 11px;
+  color: rgba(255,255,255,0.85);
+  margin-bottom: 4px;
+}
+.membership-banner .expiry-date {
+  font-size: 20px;
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+.membership-banner .expiry-info {
+  font-size: 11px;
+  color: rgba(255,255,255,0.85);
+}
+.membership-banner .renew-btn {
+  width: 100%;
+  background: white;
+  color: var(--red);
+  padding: 10px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  margin-top: 12px;
+}
+
+.membership-banner-desktop {
+  background: var(--red);
+  border-radius: 14px;
+  padding: 24px;
+  color: white;
+  margin-bottom: 24px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 20px;
+  align-items: center;
+}
+.membership-banner-desktop .level-line {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.membership-banner-desktop .level-line i {
+  font-size: 24px;
+}
+.membership-banner-desktop .level {
+  font-size: 20px;
+  font-weight: 500;
+}
+.membership-banner-desktop .expiry-label {
+  font-size: 12px;
+  color: rgba(255,255,255,0.85);
+  margin-bottom: 4px;
+}
+.membership-banner-desktop .expiry-date {
+  font-size: 24px;
+  font-weight: 500;
+  margin-bottom: 2px;
+}
+.membership-banner-desktop .expiry-info {
+  font-size: 12px;
+  color: rgba(255,255,255,0.85);
+}
+.membership-banner-desktop .renew-btn {
+  background: white;
+  color: var(--red);
+  padding: 12px 28px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* ============ Detail list (member benefits, subscription info) ============ */
+.detail-card {
+  background: white;
+  border-radius: 12px;
+  border: 0.5px solid var(--gray-300);
+  padding: 14px;
+  margin-bottom: 14px;
+}
+.detail-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 0.5px solid var(--gray-300);
+}
+.detail-row:last-child {
+  border-bottom: none;
+}
+.detail-row .left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.detail-row .left i {
+  font-size: 18px;
+  color: var(--red);
+}
+.detail-row .label {
+  font-size: 13px;
+  color: var(--gray-900);
+}
+.detail-row .label-secondary {
+  font-size: 13px;
+  color: var(--gray-600);
+}
+.detail-row .value {
+  font-size: 12px;
+  color: var(--gray-600);
+}
+.detail-row .value-bold {
+  font-size: 13px;
+  color: var(--gray-900);
+  font-weight: 500;
+}
+
+.toggle-switch {
+  width: 32px;
+  height: 18px;
+  border-radius: 9px;
+  background: var(--red);
+  position: relative;
+  display: inline-block;
+}
+.toggle-switch::after {
+  content: '';
+  position: absolute;
+  right: 2px;
+  top: 2px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: white;
+}
+
+.btn-outline-cancel {
+  width: 100%;
+  background: white;
+  border: 0.5px solid var(--gray-600);
+  color: var(--gray-600);
+  padding: 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  margin-bottom: 8px;
+}
+
+/* ============ Tabs for list pages ============ */
+.tabs-row {
+  background: white;
+  padding: 0 18px;
+  display: flex;
+  gap: 6px;
+  border-bottom: 0.5px solid var(--gray-300);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.tabs-row::-webkit-scrollbar { display: none; }
+.tab {
+  padding: 12px 10px;
+  font-size: 13px;
+  color: var(--gray-600);
+  white-space: nowrap;
+  cursor: pointer;
+  transition: color 0.15s;
+}
+.tab:first-child {
+  padding-left: 4px;
+}
+.tab.active {
+  color: var(--red);
+  border-bottom: 2px solid var(--red);
+  font-weight: 500;
+}
+
+.tabs-row-desktop {
+  display: flex;
+  gap: 8px;
+  border-bottom: 0.5px solid var(--gray-300);
+  margin-bottom: 18px;
+}
+.tabs-row-desktop .tab {
+  padding: 10px 12px;
+}
+.tabs-row-desktop .tab:first-child {
+  padding-left: 4px;
+}
+
+/* ============ Listing cards (yellow pages mgmt) ============ */
+.listing-card {
+  background: white;
+  border-radius: 12px;
+  padding: 14px;
+  border: 0.5px solid var(--gray-300);
+  margin-bottom: 12px;
+}
+.listing-card.featured {
+  border: 1.5px solid var(--red);
+}
+.listing-card .head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 10px;
+}
+.listing-card .head-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.listing-card .icon-box {
+  width: 44px;
+  height: 44px;
+  border-radius: 8px;
+  background: var(--red-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.listing-card .icon-box svg {
+  font-size: 22px;
+  color: var(--red);
+}
+.listing-card .listing-name {
+  font-size: 14px;
+  font-weight: 500;
+}
+.listing-card .listing-meta {
+  font-size: 11px;
+  color: var(--gray-600);
+  margin-top: 2px;
+}
+
+.info-strip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: 6px;
+  margin-bottom: 10px;
+  font-size: 11px;
+}
+.info-strip.red {
+  background: var(--red-light);
+  color: var(--gray-900);
+}
+.info-strip.amber {
+  background: var(--amber-bg);
+  color: var(--gray-900);
+}
+.info-strip svg {
+  font-size: 14px;
+}
+.info-strip.red svg { color: var(--red); }
+.info-strip.amber svg { color: var(--amber-text); }
+
+.listing-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 0.5px dashed var(--gray-300);
+  padding-top: 10px;
+}
+.listing-stats {
+  display: flex;
+  gap: 14px;
+  font-size: 11px;
+  color: var(--gray-600);
+  align-items: center;
+}
+.listing-stats .green { color: var(--green-text); }
+.listing-stats svg { font-size: 13px; vertical-align: -0.15em; }
+
+.listing-actions {
+  display: flex;
+  gap: 6px;
+}
+
+/* ============ Job application banner (招聘新申请提醒) ============ */
+.applications-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px;
+  border-radius: 6px;
+  margin-bottom: 10px;
+}
+.applications-banner.has-new {
+  background: var(--red-light);
+}
+.applications-banner.no-new {
+  background: var(--beige);
+}
+.applications-banner .left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.applications-banner .left svg {
+  font-size: 18px;
+}
+.applications-banner.has-new .left svg { color: var(--red); }
+.applications-banner.no-new .left svg { color: var(--gray-600); }
+.applications-banner .count {
+  font-size: 13px;
+  font-weight: 500;
+}
+.applications-banner.has-new .count { color: var(--red); }
+.applications-banner.no-new .count { color: var(--gray-900); }
+.applications-banner .timestamp {
+  font-size: 10px;
+  color: var(--gray-600);
+}
+
+/* Desktop variant of applications banner */
+.applications-banner-desktop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px;
+  border-radius: 8px;
+}
+.applications-banner-desktop.has-new { background: var(--red-light); }
+.applications-banner-desktop.no-new { background: var(--beige); }
+.applications-banner-desktop .left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.applications-banner-desktop .left > svg { font-size: 22px; }
+.applications-banner-desktop.has-new .left > svg { color: var(--red); }
+.applications-banner-desktop.no-new .left > svg { color: var(--gray-600); }
+.applications-banner-desktop .count {
+  font-size: 14px;
+  font-weight: 500;
+}
+.applications-banner-desktop.has-new .count { color: var(--red); }
+.applications-banner-desktop.no-new .count { color: var(--gray-900); }
+
+/* ============ Job card (desktop wider variant) ============ */
+.job-card {
+  background: white;
+  border-radius: 10px;
+  border: 0.5px solid var(--gray-300);
+  padding: 16px;
+  margin-bottom: 12px;
+}
+.job-card .job-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
+}
+.job-card .job-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 4px;
+}
+.job-card .job-title-text {
+  font-size: 15px;
+  font-weight: 500;
+}
+.job-card .job-meta {
+  font-size: 12px;
+  color: var(--gray-600);
+}
+.job-card .job-footer {
+  display: flex;
+  gap: 18px;
+  font-size: 11px;
+  color: var(--gray-600);
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 0.5px dashed var(--gray-300);
+}
+.job-card .job-footer svg { font-size: 13px; vertical-align: -0.15em; }
+
+/* ============ Page header with title + action button ============ */
+.page-header-with-action {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 24px;
+}
+.page-header-with-action .left .title {
+  font-size: 20px;
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+.page-header-with-action .left .subtitle {
+  font-size: 12px;
+  color: var(--gray-600);
+}
+
+/* ============ Listing detail icons on desktop ============ */
+.listing-card-desktop {
+  background: white;
+  border-radius: 10px;
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 12px;
+  border: 0.5px solid var(--gray-300);
+}
+.listing-card-desktop.featured {
+  border: 1.5px solid var(--red);
+}
+.listing-card-desktop .icon-big {
+  width: 60px;
+  height: 60px;
+  border-radius: 10px;
+  background: var(--red-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.listing-card-desktop .icon-big svg {
+  font-size: 28px;
+  color: var(--red);
+}
+.listing-card-desktop .body {
+  flex: 1;
+}
+.listing-card-desktop .name-line {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+.listing-card-desktop .name-line .name-text {
+  font-size: 14px;
+  font-weight: 500;
+}
+.listing-card-desktop .meta-line {
+  font-size: 12px;
+  color: var(--gray-600);
+  margin-bottom: 6px;
+}
+.listing-card-desktop .stats-line {
+  display: flex;
+  gap: 14px;
+  font-size: 11px;
+  color: var(--gray-600);
+}
+.listing-card-desktop .stats-line svg { font-size: 13px; vertical-align: -0.15em; }
+.listing-card-desktop .stats-line .pending-info {
+  background: var(--amber-bg);
+  color: var(--amber-text);
+  padding: 4px 8px;
+  border-radius: 4px;
+  display: inline-block;
+}
+.listing-card-desktop .right-actions {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+.listing-card-desktop .right-actions .action-btn {
+  padding: 6px 14px;
+}
+
+/* page footer helper text */
+.page-footer-hint {
+  text-align: center;
+  font-size: 11px;
+  color: var(--gray-600);
+  margin-top: 8px;
+}
+
+/* ============ Order summary cards ============ */
+.order-summary {
+  padding: 16px 18px;
+  background: white;
+  border-bottom: 8px solid var(--beige);
+  display: flex;
+  justify-content: space-between;
+}
+.order-summary .item .label {
+  font-size: 11px;
+  color: var(--gray-600);
+  margin-bottom: 4px;
+}
+.order-summary .item.right {
+  text-align: right;
+}
+.order-summary .value {
+  font-size: 24px;
+  font-weight: 500;
+}
+.order-summary .value.red {
+  color: var(--red);
+}
+
+/* ============ Order card (mobile) ============ */
+.order-card {
+  background: white;
+  border-radius: 12px;
+  border: 0.5px solid var(--gray-300);
+  padding: 14px;
+}
+.order-card .head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 10px;
+}
+.order-card .order-no-label {
+  font-size: 11px;
+  color: var(--gray-600);
+}
+.order-card .order-no {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--gray-900);
+  margin-top: 2px;
+}
+.order-card .item-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 0;
+  border-top: 0.5px dashed var(--gray-300);
+  border-bottom: 0.5px dashed var(--gray-300);
+}
+.order-card .item-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background: var(--red-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.order-card .item-icon svg {
+  font-size: 18px;
+  color: var(--red);
+}
+.order-card .item-info {
+  flex: 1;
+}
+.order-card .item-name {
+  font-size: 13px;
+  color: var(--gray-900);
+}
+.order-card .item-meta {
+  font-size: 11px;
+  color: var(--gray-600);
+  margin-top: 2px;
+}
+.order-card .item-price {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--gray-900);
+}
+.order-card .foot-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 10px;
+}
+.order-card .timestamp {
+  font-size: 11px;
+  color: var(--gray-600);
+}
+.order-card .actions {
+  display: flex;
+  gap: 6px;
+}
+
+/* ============ Orders table (desktop) ============ */
+.orders-table {
+  border: 0.5px solid var(--gray-300);
+  border-radius: 10px;
+  overflow: hidden;
+  background: white;
+}
+.orders-table .row-header {
+  display: grid;
+  grid-template-columns: 1.5fr 2fr 0.8fr 1fr 1fr 1fr;
+  padding: 12px 18px;
+  background: var(--beige);
+  font-size: 11px;
+  color: var(--gray-600);
+  font-weight: 500;
+  border-bottom: 0.5px solid var(--gray-300);
+}
+.orders-table .row-data {
+  display: grid;
+  grid-template-columns: 1.5fr 2fr 0.8fr 1fr 1fr 1fr;
+  padding: 14px 18px;
+  align-items: center;
+  font-size: 12px;
+  border-bottom: 0.5px solid var(--gray-300);
+}
+.orders-table .row-data:last-child {
+  border-bottom: none;
+}
+.orders-table .col-price {
+  text-align: right;
+  font-weight: 500;
+  color: var(--gray-900);
+}
+.orders-table .col-actions {
+  display: flex;
+  gap: 4px;
+  justify-content: flex-end;
+}
+.orders-table .col-order-no {
+  color: var(--gray-900);
+  font-weight: 500;
+}
+
+/* ============ Ad management card ============ */
+.ad-card-mobile {
+  background: white;
+  border-radius: 12px;
+  border: 0.5px solid var(--gray-300);
+  padding: 14px;
+}
+.ad-card-mobile .head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 10px;
+}
+.ad-card-mobile .ad-name {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--gray-900);
+  margin-bottom: 4px;
+}
+.ad-card-mobile .ad-meta {
+  font-size: 11px;
+  color: var(--gray-600);
+}
+.ad-preview-mobile {
+  width: 100%;
+  aspect-ratio: 2/1;
+  background: var(--beige);
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  color: var(--gray-600);
+  margin-bottom: 10px;
+}
+.ad-stats-mobile {
+  display: flex;
+  gap: 10px;
+  padding: 10px;
+  background: var(--beige);
+  border-radius: 6px;
+  margin-bottom: 10px;
+}
+.ad-stats-mobile .stat {
+  flex: 1;
+  text-align: center;
+}
+.ad-stats-mobile .stat .label {
+  font-size: 11px;
+  color: var(--gray-600);
+}
+.ad-stats-mobile .stat .value {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--gray-900);
+  margin-top: 2px;
+}
+.ad-stats-mobile .stat .value.red {
+  color: var(--red);
+}
+.ad-stats-mobile .divider {
+  border-left: 0.5px solid var(--gray-300);
+}
+
+/* Desktop ad card */
+.ad-card-desktop {
+  background: white;
+  border-radius: 10px;
+  border: 0.5px solid var(--gray-300);
+  padding: 18px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 20px;
+  align-items: flex-start;
+}
+.ad-preview-desktop {
+  width: 100%;
+  max-width: 300px;
+  aspect-ratio: 2/1;
+  background: var(--beige);
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  color: var(--gray-600);
+  text-align: center;
+  padding: 8px;
+  margin-bottom: 14px;
+}
+.ad-stats-desktop {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 14px;
+}
+.ad-stats-desktop .stat-tile {
+  background: var(--beige);
+  border-radius: 8px;
+  padding: 12px;
+}
+.ad-stats-desktop .stat-tile .label {
+  font-size: 11px;
+  color: var(--gray-600);
+  margin-bottom: 4px;
+}
+.ad-stats-desktop .stat-tile .value {
+  font-size: 20px;
+  font-weight: 500;
+  color: var(--gray-900);
+}
+.ad-stats-desktop .stat-tile .value.red {
+  color: var(--red);
+}
+.ad-meta-row {
+  display: flex;
+  gap: 18px;
+  font-size: 11px;
+  color: var(--gray-600);
+  padding-top: 12px;
+  border-top: 0.5px dashed var(--gray-300);
+}
+.ad-actions-desktop {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* ============ Auth pages (login/register) ============ */
+/* Mobile auth page */
+.auth-mobile {
+  background: white;
+  min-height: 100vh;
+  padding-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+}
+.auth-mobile-content {
+  padding: 8px 28px 28px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+.auth-logo-block {
+  text-align: center;
+  margin-bottom: 36px;
+}
+.auth-logo {
+  display: inline-block;
+  padding: 14px 22px;
+  background: white;
+  border: 0.5px solid var(--gray-300);
+  border-radius: 10px;
+  margin-bottom: 18px;
+}
+.auth-logo .name {
+  font-size: 20px;
+  font-weight: 500;
+  color: var(--red);
+}
+.auth-logo .tag {
+  font-size: 10px;
+  color: var(--gray-600);
+  margin-top: 2px;
+}
+.auth-title {
+  font-size: 22px;
+  font-weight: 500;
+  color: var(--gray-900);
+  margin-bottom: 6px;
+}
+.auth-subtitle {
+  font-size: 13px;
+  color: var(--gray-600);
+}
+
+.form-field {
+  margin-bottom: 16px;
+}
+.form-field label {
+  display: block;
+  font-size: 12px;
+  color: var(--gray-600);
+  margin-bottom: 6px;
+}
+.form-input {
+  width: 100%;
+  padding: 12px 14px;
+  border: 0.5px solid var(--gray-300);
+  border-radius: 8px;
+  font-size: 14px;
+  color: var(--gray-900);
+  background: #FAFAFA;
+  outline: none;
+  box-sizing: border-box;
+  font-family: inherit;
+  transition: border-color 0.15s;
+}
+.form-input:focus {
+  border-color: var(--red);
+  background: white;
+}
+.form-input-wrapper {
+  position: relative;
+}
+.form-input-suffix {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 13px;
+  color: var(--gray-600);
+  cursor: pointer;
+}
+
+.auth-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+.auth-checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--gray-900);
+  cursor: pointer;
+}
+.auth-checkbox-label input[type="checkbox"] {
+  accent-color: var(--red);
+  cursor: pointer;
+}
+.auth-link {
+  font-size: 13px;
+  color: var(--red);
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.auth-submit {
+  width: 100%;
+  background: var(--red);
+  border: none;
+  color: white;
+  padding: 14px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  margin-bottom: 16px;
+  transition: background 0.15s;
+}
+.auth-submit:hover {
+  background: var(--red-dark);
+}
+
+.auth-switch {
+  text-align: center;
+  font-size: 13px;
+  color: var(--gray-600);
+  margin-bottom: 24px;
+}
+.auth-switch a {
+  color: var(--red);
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.auth-guest {
+  text-align: center;
+  font-size: 12px;
+  color: var(--gray-600);
+  border-top: 0.5px solid var(--gray-300);
+  padding-top: 20px;
+  margin-top: auto;
+}
+.auth-guest a {
+  color: var(--gray-600);
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.auth-tos {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--gray-600);
+  margin-bottom: 20px;
+  cursor: pointer;
+  line-height: 1.5;
+}
+.auth-tos input[type="checkbox"] {
+  accent-color: var(--red);
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+.auth-tos a {
+  color: var(--red);
+  cursor: pointer;
+}
+
+/* Desktop auth page - split layout */
+.auth-desktop {
+  background: white;
+  border-radius: 0 0 var(--border-radius-md) var(--border-radius-md);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  min-height: 520px;
+}
+.auth-hero {
+  background: var(--red);
+  padding: 60px 50px;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.auth-hero .brand-mark {
+  font-size: 14px;
+  letter-spacing: 2px;
+  margin-bottom: 14px;
+  opacity: 0.85;
+}
+.auth-hero .headline {
+  font-size: 30px;
+  font-weight: 500;
+  line-height: 1.4;
+  margin-bottom: 18px;
+}
+.auth-hero .desc {
+  font-size: 13px;
+  line-height: 1.8;
+  opacity: 0.9;
+  margin-bottom: 28px;
+}
+.auth-hero .features {
+  border-top: 0.5px solid rgba(255,255,255,0.3);
+  padding-top: 24px;
+  font-size: 13px;
+  opacity: 0.95;
+  line-height: 2;
+}
+.auth-hero .features .feature-stat {
+  font-size: 12px;
+  opacity: 0.85;
+  line-height: 1.8;
+  margin-bottom: 6px;
+}
+
+.auth-form {
+  padding: 60px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.auth-form .form-title {
+  font-size: 24px;
+  font-weight: 500;
+  color: var(--gray-900);
+  margin-bottom: 6px;
+}
+.auth-form .form-subtitle {
+  font-size: 13px;
+  color: var(--gray-600);
+  margin-bottom: 32px;
+}
+
+/* Auth page header - simpler than main app header */
+.auth-page-header {
+  background: white;
+  padding: 14px 28px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 0.5px solid var(--gray-300);
+  border-radius: var(--border-radius-md) var(--border-radius-md) 0 0;
+}
+.auth-page-header .login-btn {
+  background: transparent;
+  border: 0.5px solid var(--red);
+  color: var(--red);
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+@media (max-width: 768px) {
+  .auth-desktop {
+    grid-template-columns: 1fr;
+  }
+  .auth-hero {
+    padding: 40px 28px;
+  }
+  .auth-form {
+    padding: 40px 28px;
+  }
+}
+
+/* Hide bottom nav and status bar when on auth pages (mobile) */
+.mobile-view .mobile-frame.on-auth > .mobile-status-bar,
+.mobile-view .mobile-frame.on-auth > .mobile-header,
+.mobile-view .mobile-frame.on-auth .mobile-bottom-nav {
+  display: none;
+}
+.mobile-view .mobile-frame.on-auth {
+  padding-bottom: 0;
+}
+
+/* When on auth page, hide main desktop frame, show only auth */
+body.on-auth .desktop-view > .desktop-frame {
+  display: none;
+}
+body:not(.on-auth) .desktop-view > .page.auth-page {
+  display: none !important;
+}
+
+/* ============ Post form pages ============ */
+.form-info-banner {
+  padding: 12px 18px;
+  background: var(--red-light);
+  border-bottom: 0.5px solid var(--gray-300);
+  font-size: 12px;
+  color: var(--gray-900);
+  line-height: 1.5;
+}
+
+.form-section {
+  background: white;
+  border: 0.5px solid var(--gray-300);
+  border-radius: 10px;
+  padding: 16px;
+  margin-bottom: 14px;
+}
+.form-section .section-title {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--gray-900);
+  margin-bottom: 14px;
+}
+
+.form-row-2col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+.form-row-3col {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 14px;
+}
+
+.form-field-small {
+  margin-bottom: 14px;
+}
+.form-field-small:last-child {
+  margin-bottom: 0;
+}
+.form-field-small label {
+  display: block;
+  font-size: 12px;
+  color: var(--gray-600);
+  margin-bottom: 6px;
+}
+.form-field-small .required {
+  color: var(--red);
+}
+
+.form-input-small,
+.form-select-small,
+.form-textarea-small {
+  width: 100%;
+  padding: 10px 12px;
+  border: 0.5px solid var(--gray-300);
+  border-radius: 6px;
+  font-size: 13px;
+  background: #FAFAFA;
+  outline: none;
+  box-sizing: border-box;
+  font-family: inherit;
+  transition: border-color 0.15s, background 0.15s;
+}
+.form-input-small:focus,
+.form-select-small:focus,
+.form-textarea-small:focus {
+  border-color: var(--red);
+  background: white;
+}
+.form-textarea-small {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.image-upload-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+}
+.image-upload-grid.cols-5 {
+  grid-template-columns: repeat(5, 1fr);
+  gap: 10px;
+}
+.image-upload-slot {
+  aspect-ratio: 1;
+  background: var(--beige);
+  border: 0.5px dashed var(--gray-600);
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  color: var(--gray-600);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.image-upload-slot:hover {
+  background: var(--red-light);
+}
+.upload-hint {
+  font-size: 11px;
+  color: var(--gray-600);
+  margin-top: 6px;
+}
+
+.form-footer-mobile {
+  display: flex;
+  gap: 10px;
+  margin-top: 18px;
+}
+.form-footer-mobile button {
+  padding: 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  cursor: pointer;
+  font-family: inherit;
+}
+.form-footer-mobile .draft-btn {
+  flex: 1;
+  background: white;
+  border: 0.5px solid var(--gray-600);
+  color: var(--gray-900);
+}
+.form-footer-mobile .submit-btn {
+  flex: 2;
+  background: var(--red);
+  border: none;
+  color: white;
+  font-weight: 500;
+}
+.form-footer-mobile .submit-btn:hover {
+  background: var(--red-dark);
+}
+
+.form-hint-line {
+  font-size: 11px;
+  color: var(--gray-600);
+  text-align: center;
+  margin-top: 8px;
+}
+
+/* Desktop form layout: main + sidebar info */
+.form-main-with-sidebar {
+  display: grid;
+  grid-template-columns: 1fr 280px;
+  gap: 20px;
+}
+
+.form-side-card {
+  background: white;
+  border: 0.5px solid var(--gray-300);
+  border-radius: 10px;
+  padding: 18px;
+  position: sticky;
+  top: 20px;
+}
+.form-side-card .title {
+  font-size: 13px;
+  font-weight: 500;
+  margin-bottom: 12px;
+}
+.form-side-card .info-block {
+  background: var(--red-light);
+  border-radius: 6px;
+  padding: 12px;
+  margin-bottom: 14px;
+  font-size: 11px;
+  color: var(--gray-900);
+  line-height: 1.6;
+}
+.form-side-card .helper-text {
+  font-size: 11px;
+  color: var(--gray-600);
+  margin-bottom: 14px;
+  line-height: 1.6;
+}
+.form-side-card .helper-text .required {
+  color: var(--red);
+  font-weight: 500;
+}
+.form-side-card .submit-btn {
+  width: 100%;
+  background: var(--red);
+  border: none;
+  color: white;
+  padding: 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  margin-bottom: 8px;
+  cursor: pointer;
+}
+.form-side-card .submit-btn:hover {
+  background: var(--red-dark);
+}
+.form-side-card .draft-btn {
+  width: 100%;
+  background: white;
+  border: 0.5px solid var(--gray-600);
+  color: var(--gray-900);
+  padding: 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.back-link {
+  font-size: 13px;
+  color: var(--gray-600);
+  margin-bottom: 6px;
+  cursor: pointer;
+}
+.back-link:hover {
+  color: var(--red);
+}
+
+@media (max-width: 768px) {
+  .form-main-with-sidebar {
+    grid-template-columns: 1fr;
+  }
+  .form-side-card {
+    position: static;
+  }
+}
+
+/* ============ Desktop welcome + stats ============ */
+.welcome {
+  margin-bottom: 24px;
+}
+.welcome .greeting {
+  font-size: 20px;
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+.welcome .date {
+  font-size: 12px;
+  color: var(--gray-600);
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  margin-bottom: 24px;
+}
+.stat-card {
+  background: white;
+  border: 0.5px solid var(--gray-300);
+  border-radius: 10px;
+  padding: 16px;
+}
+.stat-card .label {
+  font-size: 11px;
+  color: var(--gray-600);
+  margin-bottom: 6px;
+}
+.stat-card .value {
+  font-size: 24px;
+  font-weight: 500;
+}
+.stat-card .footer {
+  font-size: 11px;
+  margin-top: 2px;
+}
+.stat-card .footer.highlight {
+  color: var(--red);
+  font-weight: 500;
+}
+.stat-card .footer.muted {
+  color: var(--gray-600);
+}
+
+/* ============ My listings preview (desktop) ============ */
+.section-header {
+  margin-bottom: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.section-header .title {
+  font-size: 15px;
+  font-weight: 500;
+}
+.section-header .more {
+  font-size: 12px;
+  color: var(--red);
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.listings-table {
+  border: 0.5px solid var(--gray-300);
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 24px;
+  background: white;
+}
+.listing-row {
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border-bottom: 0.5px solid var(--gray-300);
+}
+.listing-row:last-child {
+  border-bottom: none;
+}
+.listing-row .icon-box {
+  width: 44px;
+  height: 44px;
+  border-radius: 8px;
+  background: var(--red-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.listing-row .icon-box i {
+  font-size: 22px;
+  color: var(--red);
+}
+.listing-row .info {
+  flex: 1;
+}
+.listing-row .name {
+  font-size: 13px;
+  font-weight: 500;
+}
+.listing-row .meta {
+  font-size: 11px;
+  color: var(--gray-600);
+  margin-top: 2px;
+}
+
+.status-badge {
+  font-size: 10px;
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+.status-badge.featured {
+  background: var(--red);
+  color: white;
+}
+.status-badge.published {
+  background: var(--green-bg);
+  color: var(--green-text);
+}
+.status-badge.pending {
+  background: var(--amber-bg);
+  color: var(--amber-text);
+}
+.status-badge.contacted {
+  background: var(--red-light);
+  color: var(--red);
+}
+.status-badge.muted {
+  background: #F0F0F0;
+  color: var(--gray-600);
+}
+.status-badge.submitted {
+  background: #DBEAFE;
+  color: #1E3A8A;
+}
+
+.action-btn {
+  background: transparent;
+  border: 0.5px solid var(--gray-600);
+  padding: 5px 12px;
+  border-radius: 6px;
+  font-size: 11px;
+  color: var(--gray-900);
+  transition: all 0.2s;
+}
+.action-btn:hover {
+  background: var(--beige);
+}
+.action-btn.primary {
+  background: var(--red);
+  border-color: var(--red);
+  color: white;
+  font-weight: 500;
+}
+.action-btn.primary:hover {
+  background: var(--red-dark);
+}
+
+.bottom-actions {
+  display: flex;
+  gap: 12px;
+}
+.bottom-actions button {
+  flex: 1;
+  padding: 11px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+.bottom-actions .primary {
+  background: var(--red);
+  color: white;
+}
+.bottom-actions .primary:hover {
+  background: var(--red-dark);
+}
+.bottom-actions .secondary {
+  background: white;
+  border: 0.5px solid var(--red);
+  color: var(--red);
+}
+.bottom-actions .secondary:hover {
+  background: var(--red-light);
+}
+
+/* ============ Page transitions ============ */
+.page {
+  display: none;
+  animation: fadeIn 0.2s ease-out;
+}
+.page.active {
+  display: block;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ============ Hint banner ============ */
+.hint-banner {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--gray-900);
+  color: white;
+  padding: 10px 20px;
+  border-radius: 24px;
+  font-size: 12px;
+  z-index: 999;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  opacity: 0;
+  transition: opacity 0.3s;
+  pointer-events: none;
+}
+.hint-banner.show {
+  opacity: 1;
+}
+
+/* ============ Responsive ============ */
+@media (max-width: 768px) {
+  .mobile-view { display: block; }
+  .desktop-view { display: none; }
+  body.force-desktop .mobile-view { display: none; }
+  body.force-desktop .desktop-view { display: block; }
+}
+@media (min-width: 769px) {
+  .mobile-view { display: none; }
+  .desktop-view { display: block; }
+  body.force-mobile .mobile-view { display: block; }
+  body.force-mobile .desktop-view { display: none; }
+  body.force-mobile .view-switcher { /* keep visible */ }
+}
+</style>
+</head>
+<body>
+
+<!-- SVG icon sprite - all icons defined here, used via <use href="#..."> -->
+<svg xmlns="http://www.w3.org/2000/svg" style="display:none">
+<defs>
+<symbol id="i-home" viewBox="0 0 24 24"><path d="M5 12l-2 0l9 -9l9 9l-2 0"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7"/><path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6"/></symbol>
+<symbol id="i-news" viewBox="0 0 24 24"><path d="M16 6h3a1 1 0 0 1 1 1v11a2 2 0 0 1 -4 0v-13a1 1 0 0 0 -1 -1h-11a1 1 0 0 0 -1 1v12a3 3 0 0 0 3 3h14"/><line x1="8" y1="8" x2="12" y2="8"/><line x1="8" y1="12" x2="12" y2="12"/><line x1="8" y1="16" x2="12" y2="16"/></symbol>
+<symbol id="i-building-store" viewBox="0 0 24 24"><line x1="3" y1="21" x2="21" y2="21"/><path d="M3 7v1a3 3 0 0 0 6 0v-1m0 1a3 3 0 0 0 6 0v-1m0 1a3 3 0 0 0 6 0v-1h-18l2 -4h14l2 4"/><path d="M5 21l0 -10.15"/><path d="M19 21l0 -10.15"/><path d="M9 21v-4a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v4"/></symbol>
+<symbol id="i-briefcase" viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7v-2a2 2 0 0 1 2 -2h4a2 2 0 0 1 2 2v2"/><line x1="12" y1="12" x2="12" y2="12.01"/><path d="M3 13a20 20 0 0 0 18 0"/></symbol>
+<symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="7" r="4"/><path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2"/></symbol>
+<symbol id="i-settings" viewBox="0 0 24 24"><path d="M10.325 4.317c.426 -1.756 2.924 -1.756 3.35 0a1.724 1.724 0 0 0 2.573 1.066c1.543 -.94 3.31 .826 2.37 2.37a1.724 1.724 0 0 0 1.065 2.572c1.756 .426 1.756 2.924 0 3.35a1.724 1.724 0 0 0 -1.066 2.573c.94 1.543 -.826 3.31 -2.37 2.37a1.724 1.724 0 0 0 -2.572 1.065c-.426 1.756 -2.924 1.756 -3.35 0a1.724 1.724 0 0 0 -2.573 -1.066c-1.543 .94 -3.31 -.826 -2.37 -2.37a1.724 1.724 0 0 0 -1.065 -2.572c-1.756 -.426 -1.756 -2.924 0 -3.35a1.724 1.724 0 0 0 1.066 -2.573c-.94 -1.543 .826 -3.31 2.37 -2.37c1 .608 2.296 .07 2.572 -1.065z"/><circle cx="12" cy="12" r="3"/></symbol>
+<symbol id="i-chevron-right" viewBox="0 0 24 24"><polyline points="9 6 15 12 9 18"/></symbol>
+<symbol id="i-arrow-left" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="11 6 5 12 11 18"/></symbol>
+<symbol id="i-plus" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></symbol>
+<symbol id="i-circle-check" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><polyline points="9 12 11 14 15 10"/></symbol>
+<symbol id="i-id-badge" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="3"/><circle cx="9" cy="10" r="2"/><line x1="15" y1="8" x2="17" y2="8"/><line x1="15" y1="12" x2="17" y2="12"/><line x1="7" y1="16" x2="17" y2="16"/></symbol>
+<symbol id="i-receipt" viewBox="0 0 24 24"><path d="M5 21v-16a2 2 0 0 1 2 -2h10a2 2 0 0 1 2 2v16l-3 -2l-2 2l-2 -2l-2 2l-2 -2l-3 2"/><line x1="9" y1="7" x2="15" y2="7"/><line x1="9" y1="11" x2="15" y2="11"/></symbol>
+<symbol id="i-user-cog" viewBox="0 0 24 24"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 0 1 4 -4h4"/><circle cx="18" cy="18" r="3"/><line x1="18" y1="14.5" x2="18" y2="15"/><line x1="18" y1="21" x2="18" y2="21.5"/><line x1="21.5" y1="18" x2="21" y2="18"/><line x1="15" y1="18" x2="14.5" y2="18"/><line x1="20.5" y1="15.5" x2="20" y2="16"/><line x1="16" y1="20" x2="15.5" y2="20.5"/><line x1="20.5" y1="20.5" x2="20" y2="20"/><line x1="16" y1="16" x2="15.5" y2="15.5"/></symbol>
+<symbol id="i-heart" viewBox="0 0 24 24"><path d="M19.5 13.572l-7.5 7.428l-7.5 -7.428a5 5 0 1 1 7.5 -6.566a5 5 0 1 1 7.5 6.572"/></symbol>
+<symbol id="i-thumb-up" viewBox="0 0 24 24"><path d="M7 11v8a1 1 0 0 1 -1 1h-2a1 1 0 0 1 -1 -1v-7a1 1 0 0 1 1 -1h3a4 4 0 0 0 4 -4v-1a2 2 0 0 1 4 0v5h3a2 2 0 0 1 2 2l-1 5a2 3 0 0 1 -2 2h-7a3 3 0 0 1 -3 -3"/></symbol>
+<symbol id="i-message-circle" viewBox="0 0 24 24"><path d="M3 20l1.3 -3.9a9 8 0 1 1 3.4 2.9l-4.7 1"/><line x1="12" y1="12" x2="12" y2="12.01"/><line x1="8" y1="12" x2="8" y2="12.01"/><line x1="16" y1="12" x2="16" y2="12.01"/></symbol>
+<symbol id="i-star" viewBox="0 0 24 24"><polygon points="12 17.27 18.18 21 16.54 13.97 22 9.24 14.81 8.62 12 2 9.19 8.62 2 9.24 7.45 13.97 5.82 21 12 17.27"/></symbol>
+<symbol id="i-photo" viewBox="0 0 24 24"><line x1="15" y1="8" x2="15.01" y2="8"/><rect x="4" y="4" width="16" height="16" rx="3"/><path d="M4 15l4 -4a3 5 0 0 1 3 0l5 5"/><path d="M14 14l1 -1a3 5 0 0 1 3 0l2 2"/></symbol>
+<symbol id="i-dashboard" viewBox="0 0 24 24"><circle cx="12" cy="13" r="2"/><line x1="13.45" y1="11.55" x2="15.5" y2="9.5"/><path d="M6.4 20a9 9 0 1 1 11.2 0z"/></symbol>
+<symbol id="i-credit-card" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="3"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="7" y1="15" x2="7.01" y2="15"/><line x1="11" y1="15" x2="13" y2="15"/></symbol>
+<symbol id="i-logout" viewBox="0 0 24 24"><path d="M14 8v-2a2 2 0 0 0 -2 -2h-7a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h7a2 2 0 0 0 2 -2v-2"/><line x1="9" y1="12" x2="21" y2="12"/><polyline points="18 15 21 12 18 9"/></symbol>
+<symbol id="i-tools" viewBox="0 0 24 24"><path d="M3 21h4l13 -13a1.5 1.5 0 0 0 -4 -4l-13 13v4"/><line x1="14.5" y1="5.5" x2="18.5" y2="9.5"/><polyline points="12 8 7 3 3 7 8 12"/><line x1="7" y1="8" x2="5.5" y2="9.5"/><polyline points="16 12 21 17 17 21 12 16"/><line x1="16" y1="17" x2="14.5" y2="18.5"/></symbol>
+<symbol id="i-paint" viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="6" rx="2"/><path d="M19 6h1a2 2 0 0 1 2 2a5 5 0 0 1 -5 5l-5 0v2"/><rect x="10" y="15" width="4" height="6" rx="1"/></symbol>
+<symbol id="i-tool" viewBox="0 0 24 24"><path d="M7 10h3v-3l-3.5 -3.5a6 6 0 0 1 8 8l6 6a2 2 0 0 1 -3 3l-6 -6a6 6 0 0 1 -8 -8l3.5 3.5"/></symbol>
+<symbol id="i-signal" viewBox="0 0 24 24"><path d="M3 21h.01"/><path d="M7 17l0 4"/><path d="M11 13l0 8"/><path d="M15 9l0 12"/><path d="M19 5l0 16"/></symbol>
+<symbol id="i-wifi" viewBox="0 0 24 24"><path d="M12 18l.01 0"/><path d="M9.172 15.172a4 4 0 0 1 5.656 0"/><path d="M6.343 12.343a8 8 0 0 1 11.314 0"/><path d="M3.515 9.515c4.686 -4.687 12.284 -4.687 17 0"/></symbol>
+<symbol id="i-battery" viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="12" rx="2"/><line x1="22" y1="11" x2="22" y2="13"/><line x1="5" y1="10" x2="5" y2="14"/><line x1="9" y1="10" x2="9" y2="14"/><line x1="13" y1="10" x2="13" y2="14"/></symbol>
+<symbol id="i-eye" viewBox="0 0 24 24"><circle cx="12" cy="12" r="2"/><path d="M22 12c-2.667 4.667 -6 7 -10 7s-7.333 -2.333 -10 -7c2.667 -4.667 6 -7 10 -7s7.333 2.333 10 7"/></symbol>
+<symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></symbol>
+<symbol id="i-calendar" viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="16" rx="2"/><line x1="16" y1="3" x2="16" y2="7"/><line x1="8" y1="3" x2="8" y2="7"/><line x1="4" y1="11" x2="20" y2="11"/><line x1="11" y1="15" x2="12" y2="15"/><line x1="12" y1="15" x2="12" y2="18"/></symbol>
+<symbol id="i-info-circle" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12.01" y2="8"/><polyline points="11 12 12 12 12 16 13 16"/></symbol>
+<symbol id="i-check" viewBox="0 0 24 24"><polyline points="5 12 10 17 19 8"/></symbol>
+<symbol id="i-search" viewBox="0 0 24 24"><circle cx="10" cy="10" r="7"/><line x1="21" y1="21" x2="15" y2="15"/></symbol>
+</defs>
+</svg>
+
+<!-- View Switcher -->
+<div class="view-switcher">
+  <button id="btn-mobile" onclick="setView('mobile')">手机</button>
+  <button id="btn-desktop" onclick="setView('desktop')">桌面</button>
+  <button id="btn-auto" class="active" onclick="setView('auto')">自适应</button>
+</div>
+
+<!-- Auth Demo Switcher -->
+<div style="position:fixed;top:62px;right:12px;z-index:1000;background:#FFFFFF;border:0.5px solid #E5E5E5;border-radius:24px;padding:6px;display:flex;gap:4px;font-size:11px;box-shadow:0 2px 8px rgba(0,0,0,0.08)">
+  <button onclick="goToPage('login')" style="background:transparent;border:none;padding:5px 10px;border-radius:18px;font-size:11px;cursor:pointer;color:#6B6B6B">登录页</button>
+  <button onclick="goToPage('register')" style="background:transparent;border:none;padding:5px 10px;border-radius:18px;font-size:11px;cursor:pointer;color:#6B6B6B">注册页</button>
+  <button onclick="goToPage('overview')" style="background:#C8102E;border:none;padding:5px 10px;border-radius:18px;font-size:11px;cursor:pointer;color:white">已登录</button>
+</div>
+
+<!-- Hint banner -->
+<div class="hint-banner" id="hint"></div>
+
+<!-- ============================================================ -->
+<!-- MOBILE VIEW                                                    -->
+<!-- ============================================================ -->
+<div class="mobile-view">
+<div class="mobile-frame">
+
+  <!-- Status bar (shared) -->
+  <div class="mobile-status-bar">
+    <span>9:41</span>
+    <span class="icons">
+      <svg class="icon"><use href="#i-signal"/></svg>
+      <svg class="icon"><use href="#i-wifi"/></svg>
+      <svg class="icon"><use href="#i-battery"/></svg>
+    </span>
+  </div>
+
+  <!-- PAGE: Overview -->
+  <div class="page active" data-page="overview">
+    <div class="mobile-header">
+      <span class="title">我的账户</span>
+      <svg class="icon" style="font-size:22px;color:var(--red);cursor:pointer" onclick="goToPage('account-settings')"><use href="#i-settings"/></svg>
+    </div>
+
+    <div class="mobile-content">
+      <!-- Profile card -->
+      <div class="profile-card">
+        <div class="row">
+          <div class="avatar">Sue</div>
+          <div class="info">
+            <div class="name-line">
+              <span class="name">Sue</span>
+              <span class="badge">公司会员</span>
+            </div>
+            <div class="expiry">会员到期: 2027-05-11</div>
+          </div>
+          <button class="renew-btn" onclick="goToPage('membership')">续费</button>
+        </div>
+      </div>
+
+      <!-- Quick actions -->
+      <div class="quick-actions">
+        <button class="primary" onclick="goToPage('post-listing')">
+          <svg class="icon"><use href="#i-plus"/></svg> 发布黄页
+        </button>
+        <button class="secondary" onclick="goToPage('post-job')">
+          <svg class="icon"><use href="#i-plus"/></svg> 发布招聘
+        </button>
+      </div>
+
+      <!-- Business management -->
+      <div class="section-label">商家管理</div>
+      <div class="card-group">
+        <div class="card-row" onclick="goToPage('listings')">
+          <div class="card-icon"><svg class="icon"><use href="#i-building-store"/></svg></div>
+          <div class="card-content">
+            <div class="title">黄页管理</div>
+            <div class="subtitle">3 条 · <span class="highlight">1 个置顶中</span></div>
+          </div>
+          <svg class="icon chevron"><use href="#i-chevron-right"/></svg>
+        </div>
+        <div class="card-row" onclick="goToPage('jobs')">
+          <div class="card-icon"><svg class="icon"><use href="#i-briefcase"/></svg></div>
+          <div class="card-content">
+            <div class="title">招聘管理</div>
+            <div class="subtitle">2 职位 · <span class="highlight">5 份新申请</span></div>
+          </div>
+          <svg class="icon chevron"><use href="#i-chevron-right"/></svg>
+        </div>
+        <div class="card-row" onclick="goToPage('ads')">
+          <div class="card-icon"><svg class="icon"><use href="#i-photo"/></svg></div>
+          <div class="card-content">
+            <div class="title">广告管理</div>
+            <div class="subtitle">1 个广告投放中</div>
+          </div>
+          <svg class="icon chevron"><use href="#i-chevron-right"/></svg>
+        </div>
+      </div>
+
+      <!-- Browse & Interact -->
+      <div class="section-label">浏览与互动</div>
+      <div class="card-group">
+        <div class="card-row" onclick="showHint('点击进入收藏的黄页 (即将完成)')">
+          <div class="card-icon"><svg class="icon"><use href="#i-heart"/></svg></div>
+          <div class="card-content">
+            <div class="title">收藏的黄页</div>
+            <div class="subtitle">12 个收藏</div>
+          </div>
+          <svg class="icon chevron"><use href="#i-chevron-right"/></svg>
+        </div>
+        <div class="card-row" onclick="goToPage('applications')">
+          <div class="card-icon"><svg class="icon"><use href="#i-briefcase"/></svg></div>
+          <div class="card-content">
+            <div class="title">工作申请</div>
+            <div class="subtitle">4 份申请 · <span class="highlight">3 个职位仍在线</span></div>
+          </div>
+          <svg class="icon chevron"><use href="#i-chevron-right"/></svg>
+        </div>
+        <div class="card-row disabled">
+          <div class="card-icon gray"><svg class="icon"><use href="#i-message-circle"/></svg></div>
+          <div class="card-content">
+            <div class="title">我的评论</div>
+            <div class="subtitle">敬请期待</div>
+          </div>
+          <svg class="icon chevron"><use href="#i-chevron-right"/></svg>
+        </div>
+        <div class="card-row disabled">
+          <div class="card-icon gray"><svg class="icon"><use href="#i-star"/></svg></div>
+          <div class="card-content">
+            <div class="title">我的评分</div>
+            <div class="subtitle">敬请期待</div>
+          </div>
+          <svg class="icon chevron"><use href="#i-chevron-right"/></svg>
+        </div>
+      </div>
+
+      <!-- Account & Orders -->
+      <div class="section-label">账户与订单</div>
+      <div class="card-group">
+        <div class="card-row" onclick="goToPage('membership')">
+          <div class="card-icon"><svg class="icon"><use href="#i-id-badge"/></svg></div>
+          <div class="card-content">
+            <div class="title">会员中心</div>
+            <div class="subtitle">公司会员 · 到期 2027-05-11</div>
+          </div>
+          <svg class="icon chevron"><use href="#i-chevron-right"/></svg>
+        </div>
+        <div class="card-row" onclick="goToPage('orders')">
+          <div class="card-icon"><svg class="icon"><use href="#i-receipt"/></svg></div>
+          <div class="card-content">
+            <div class="title">订单与发票</div>
+            <div class="subtitle">3 笔订单 · 本年 $148</div>
+          </div>
+          <svg class="icon chevron"><use href="#i-chevron-right"/></svg>
+        </div>
+        <div class="card-row" onclick="showHint('点击进入账户设置 (即将完成)')">
+          <div class="card-icon"><svg class="icon"><use href="#i-user-cog"/></svg></div>
+          <div class="card-content">
+            <div class="title">账户设置</div>
+            <div class="subtitle">资料 · 密码 · 通知</div>
+          </div>
+          <svg class="icon chevron"><use href="#i-chevron-right"/></svg>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAGE: Membership Center -->
+  <div class="page" data-page="membership">
+    <div class="mobile-header">
+      <div class="back">
+        <svg class="icon" style="cursor:pointer" onclick="goToPage('overview')"><use href="#i-arrow-left"/></svg>
+        <span class="title">会员中心</span>
+      </div>
+    </div>
+
+    <div class="mobile-content">
+      <div class="membership-banner">
+        <div class="top">
+          <svg class="icon"><use href="#i-id-badge"/></svg>
+          <span class="level">公司会员</span>
+          <span class="status">激活中</span>
+        </div>
+        <div class="expiry-block">
+          <div class="expiry-label">到期日</div>
+          <div class="expiry-date">2027-05-11</div>
+          <div class="expiry-info">还剩 365 天 · $99 CAD/年</div>
+        </div>
+        <button class="renew-btn" onclick="showHint('点击进入续费付款流程')">立即续费</button>
+      </div>
+
+      <div class="section-label">会员权益</div>
+      <div class="detail-card">
+        <div class="detail-row">
+          <div class="left">
+            <svg class="icon"><use href="#i-circle-check"/></svg>
+            <span class="label">发布黄页</span>
+          </div>
+          <span class="value">3 / 3 已用</span>
+        </div>
+        <div class="detail-row">
+          <div class="left">
+            <svg class="icon"><use href="#i-circle-check"/></svg>
+            <span class="label">发布招聘信息</span>
+          </div>
+          <span class="value">不限</span>
+        </div>
+        <div class="detail-row">
+          <div class="left">
+            <svg class="icon"><use href="#i-circle-check"/></svg>
+            <span class="label">投放广告资格</span>
+          </div>
+          <span class="value">可投放</span>
+        </div>
+        <div class="detail-row">
+          <div class="left">
+            <svg class="icon"><use href="#i-circle-check"/></svg>
+            <span class="label">公司会员标识</span>
+          </div>
+          <span class="value">已启用</span>
+        </div>
+      </div>
+
+      <div class="section-label">订阅信息</div>
+      <div class="card-group">
+        <div class="card-row" style="cursor:default">
+          <div class="card-content">
+            <div class="title" style="font-size:13px;color:var(--gray-600);font-weight:400">年费</div>
+          </div>
+          <span class="value-bold" style="font-size:13px;font-weight:500">$99 CAD / 年</span>
+        </div>
+        <div class="card-row" style="cursor:default">
+          <div class="card-content">
+            <div class="title" style="font-size:13px;color:var(--gray-600);font-weight:400">开通日期</div>
+          </div>
+          <span style="font-size:13px">2026-05-11</span>
+        </div>
+        <div class="card-row" style="cursor:default">
+          <div class="card-content">
+            <div class="title" style="font-size:13px;color:var(--gray-600);font-weight:400">自动续费</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px">
+            <span style="font-size:13px;color:var(--red);font-weight:500">已开启</span>
+            <div class="toggle-switch"></div>
+          </div>
+        </div>
+        <div class="card-row" style="cursor:default">
+          <div class="card-content">
+            <div class="title" style="font-size:13px;color:var(--gray-600);font-weight:400">支付方式</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px">
+            <svg class="icon" style="font-size:16px"><use href="#i-credit-card"/></svg>
+            <span style="font-size:13px">**** 4242</span>
+          </div>
+        </div>
+      </div>
+
+      <button class="btn-outline-cancel" onclick="showHint('点击取消自动续费 (会有确认弹窗)')">取消自动续费</button>
+    </div>
+  </div>
+
+  <!-- PAGE: Listings Management (Mobile) -->
+  <div class="page" data-page="listings">
+    <div class="mobile-header">
+      <div class="back">
+        <svg class="icon" style="cursor:pointer" onclick="goToPage('overview')"><use href="#i-arrow-left"/></svg>
+        <span class="title">黄页管理</span>
+      </div>
+    </div>
+
+    <div class="tabs-row">
+      <div class="tab active">全部 (3)</div>
+      <div class="tab">已发布 (2)</div>
+      <div class="tab">审核中 (1)</div>
+      <div class="tab">草稿</div>
+    </div>
+
+    <div class="mobile-content" style="padding:14px 18px">
+
+      <!-- Listing 1: featured -->
+      <div class="listing-card">
+        <div class="head">
+          <div class="head-left">
+            <div class="icon-box"><svg class="icon"><use href="#i-tools"/></svg></div>
+            <div>
+              <div class="listing-name">Sue 装修工程</div>
+              <div class="listing-meta">装修建筑 · 多伦多</div>
+            </div>
+          </div>
+          <span class="status-badge featured">置顶中</span>
+        </div>
+        <div class="listing-footer">
+          <div class="listing-stats">
+            <span><svg class="icon" style="font-size:13px"><use href="#i-eye"/></svg> 487</span>
+          </div>
+          <div class="listing-actions">
+            <button class="action-btn" disabled style="opacity:0.5;cursor:not-allowed">已置顶</button>
+            <button class="action-btn" onclick="showHint('打开黄页编辑表单')">编辑</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Listing 2: published, can promote -->
+      <div class="listing-card">
+        <div class="head">
+          <div class="head-left">
+            <div class="icon-box"><svg class="icon"><use href="#i-home"/></svg></div>
+            <div>
+              <div class="listing-name">Sue 地板专卖</div>
+              <div class="listing-meta">建材 · 万锦</div>
+            </div>
+          </div>
+          <span class="status-badge published">已发布</span>
+        </div>
+        <div class="listing-footer">
+          <div class="listing-stats">
+            <span><svg class="icon" style="font-size:13px"><use href="#i-eye"/></svg> 312</span>
+            <span><svg class="icon" style="font-size:13px"><use href="#i-calendar"/></svg> 2026-02-15</span>
+          </div>
+          <div class="listing-actions">
+            <button class="action-btn primary" onclick="showHint('点击进入购买置顶流程 ($29/30天)')">置顶</button>
+            <button class="action-btn" onclick="showHint('打开黄页编辑表单')">编辑</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Listing 3: pending -->
+      <div class="listing-card">
+        <div class="head">
+          <div class="head-left">
+            <div class="icon-box"><svg class="icon"><use href="#i-paint"/></svg></div>
+            <div>
+              <div class="listing-name">Sue 油漆工程</div>
+              <div class="listing-meta">装修建筑 · 列治文山</div>
+            </div>
+          </div>
+          <span class="status-badge pending">审核中</span>
+        </div>
+        <div class="listing-footer">
+          <div class="listing-stats">
+            <span style="color:var(--amber-text)"><svg class="icon" style="font-size:13px"><use href="#i-info-circle"/></svg> 1-2 工作日</span>
+          </div>
+          <div class="listing-actions">
+            <button class="action-btn" onclick="showHint('打开编辑表单')">编辑</button>
+            <button class="action-btn" style="border-color:var(--red);color:var(--red)" onclick="showHint('确认要撤回这条黄页吗?')">撤回</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div style="padding:0 18px 18px">
+      <button style="width:100%;background:var(--red);border:none;color:white;padding:12px;border-radius:8px;font-size:14px;font-weight:500;cursor:pointer" onclick="goToPage('post-listing')">+ 发布新黄页</button>
+      <div class="page-footer-hint">公司会员可发布 3 条 · 已用 3/3</div>
+    </div>
+  </div>
+
+  <!-- PAGE: Jobs Management (Mobile) -->
+  <div class="page" data-page="jobs">
+    <div class="mobile-header">
+      <div class="back">
+        <svg class="icon" style="cursor:pointer" onclick="goToPage('overview')"><use href="#i-arrow-left"/></svg>
+        <span class="title">招聘管理</span>
+      </div>
+    </div>
+
+    <div class="tabs-row">
+      <div class="tab active">在线 (2)</div>
+      <div class="tab">已过期 (1)</div>
+      <div class="tab">草稿</div>
+    </div>
+
+    <div class="mobile-content" style="padding:14px 18px">
+
+      <!-- Job 1 -->
+      <div class="listing-card">
+        <div class="head">
+          <div style="flex:1">
+            <div class="listing-name">资深室内设计师</div>
+            <div class="listing-meta">Sue 装修工程 · 多伦多 · 全职</div>
+          </div>
+          <span class="status-badge published">在线</span>
+        </div>
+        <div class="listing-footer">
+          <div class="listing-stats">
+            <span><svg class="icon" style="font-size:13px"><use href="#i-user"/></svg> 7 份申请 (3 新)</span>
+            <span><svg class="icon" style="font-size:13px"><use href="#i-calendar"/></svg> 到期 6-12</span>
+          </div>
+          <div class="listing-actions">
+            <button class="action-btn primary" onclick="showHint('查看求职申请列表')">查看申请</button>
+            <button class="action-btn" onclick="showHint('打开职位编辑表单')">编辑</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Job 2 -->
+      <div class="listing-card">
+        <div class="head">
+          <div style="flex:1">
+            <div class="listing-name">水电安装技工</div>
+            <div class="listing-meta">Sue 装修工程 · 万锦 · 全职</div>
+          </div>
+          <span class="status-badge published">在线</span>
+        </div>
+        <div class="listing-footer">
+          <div class="listing-stats">
+            <span><svg class="icon" style="font-size:13px"><use href="#i-user"/></svg> 2 份申请</span>
+            <span><svg class="icon" style="font-size:13px"><use href="#i-calendar"/></svg> 到期 5-28</span>
+          </div>
+          <div class="listing-actions">
+            <button class="action-btn" onclick="showHint('查看求职申请列表')">查看申请</button>
+            <button class="action-btn" onclick="showHint('打开职位编辑表单')">编辑</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div style="padding:0 18px 18px">
+      <button style="width:100%;background:var(--red);border:none;color:white;padding:12px;border-radius:8px;font-size:14px;font-weight:500;cursor:pointer" onclick="goToPage('post-job')">+ 发布新职位</button>
+      <div class="page-footer-hint">公司会员可发布不限数量职位</div>
+    </div>
+  </div>
+
+  <!-- PAGE: Orders (Mobile) -->
+  <div class="page" data-page="orders">
+    <div class="mobile-header">
+      <div class="back">
+        <svg class="icon" style="cursor:pointer" onclick="goToPage('overview')"><use href="#i-arrow-left"/></svg>
+        <span class="title">订单与发票</span>
+      </div>
+    </div>
+
+    <div class="order-summary">
+      <div class="item">
+        <div class="label">本年累计消费</div>
+        <div class="value red">$148.00</div>
+      </div>
+      <div class="item right">
+        <div class="label">订单数量</div>
+        <div class="value">3</div>
+      </div>
+    </div>
+
+    <div class="tabs-row">
+      <div class="tab active">全部 (3)</div>
+      <div class="tab">已完成 (3)</div>
+    </div>
+
+    <div class="mobile-content" style="padding:14px 18px;display:flex;flex-direction:column;gap:12px">
+
+      <div class="order-card">
+        <div class="head">
+          <div>
+            <div class="order-no-label">订单号</div>
+            <div class="order-no">#CCCA-2026-0512</div>
+          </div>
+          <span class="status-badge published">已完成</span>
+        </div>
+        <div class="item-row">
+          <div class="item-icon"><svg class="icon"><use href="#i-star"/></svg></div>
+          <div class="item-info">
+            <div class="item-name">黄页置顶 30 天</div>
+            <div class="item-meta">Sue 装修工程</div>
+          </div>
+          <div class="item-price">$29.00</div>
+        </div>
+        <div class="foot-row">
+          <div class="timestamp">2026-05-11 14:23</div>
+          <div class="actions">
+            <button class="action-btn" onclick="showHint('下载 PDF 发票')">下载发票</button>
+            <button class="action-btn" onclick="showHint('查看订单详情')">详情</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="order-card">
+        <div class="head">
+          <div>
+            <div class="order-no-label">订单号</div>
+            <div class="order-no">#CCCA-2026-0398</div>
+          </div>
+          <span class="status-badge published">已完成</span>
+        </div>
+        <div class="item-row">
+          <div class="item-icon"><svg class="icon"><use href="#i-photo"/></svg></div>
+          <div class="item-info">
+            <div class="item-name">侧栏广告 1 个月</div>
+            <div class="item-meta">2026-04-15 至 2026-05-15</div>
+          </div>
+          <div class="item-price">$99.00</div>
+        </div>
+        <div class="foot-row">
+          <div class="timestamp">2026-04-15 09:12</div>
+          <div class="actions">
+            <button class="action-btn" onclick="showHint('下载 PDF 发票')">下载发票</button>
+            <button class="action-btn" onclick="showHint('查看订单详情')">详情</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="order-card">
+        <div class="head">
+          <div>
+            <div class="order-no-label">订单号</div>
+            <div class="order-no">#CCCA-2026-0201</div>
+          </div>
+          <span class="status-badge published">已完成</span>
+        </div>
+        <div class="item-row">
+          <div class="item-icon"><svg class="icon"><use href="#i-id-badge"/></svg></div>
+          <div class="item-info">
+            <div class="item-name">公司会员年费</div>
+            <div class="item-meta">2026-02-11 至 2027-02-11</div>
+          </div>
+          <div class="item-price">$20.00</div>
+        </div>
+        <div class="foot-row">
+          <div class="timestamp">2026-02-11 16:45</div>
+          <div class="actions">
+            <button class="action-btn" onclick="showHint('下载 PDF 发票')">下载发票</button>
+            <button class="action-btn" onclick="showHint('查看订单详情')">详情</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- PAGE: Ads Management (Mobile) -->
+  <div class="page" data-page="ads">
+    <div class="mobile-header">
+      <div class="back">
+        <svg class="icon" style="cursor:pointer" onclick="goToPage('overview')"><use href="#i-arrow-left"/></svg>
+        <span class="title">广告管理</span>
+      </div>
+    </div>
+
+    <div class="form-info-banner">
+      广告素材由管理员审核后手动上线 · 如需更换或续期请联系协会
+    </div>
+
+    <div class="tabs-row">
+      <div class="tab active">投放中 (1)</div>
+      <div class="tab">已结束 (2)</div>
+    </div>
+
+    <div class="mobile-content" style="padding:14px 18px;display:flex;flex-direction:column;gap:12px">
+
+      <div class="ad-card-mobile">
+        <div class="head">
+          <div>
+            <div class="ad-name">侧栏广告 - 装修服务</div>
+            <div class="ad-meta">600×300 横版 · 所有页面侧栏</div>
+          </div>
+          <span class="status-badge published">投放中</span>
+        </div>
+        <div class="ad-preview-mobile">广告素材预览</div>
+        <div style="display:flex;justify-content:space-between;align-items:center;border-top:0.5px dashed var(--gray-300);padding-top:10px;margin-bottom:10px">
+          <div style="font-size:11px;color:var(--gray-600)">投放 2026-04-15 至 05-15 · 剩余 4 天</div>
+        </div>
+        <div style="display:flex;gap:6px">
+          <button class="action-btn primary" style="flex:1" onclick="showHint('打开续期申请,管理员将延长广告期')">申请续期</button>
+          <button class="action-btn" style="flex:1" onclick="showHint('打开邮件给管理员发送新素材')">联系更换</button>
+        </div>
+      </div>
+
+    </div>
+
+    <div style="padding:0 18px 18px">
+      <button style="width:100%;background:var(--red);border:none;color:white;padding:12px;border-radius:8px;font-size:14px;font-weight:500;cursor:pointer" onclick="showHint('打开投放新广告申请表单(填写信息+上传素材,管理员审核后上线)')">+ 申请投放新广告</button>
+      <div class="page-footer-hint">侧栏广告 $99/月 · 仅公司会员可投放 · 600×300 横版</div>
+    </div>
+  </div>
+
+  <!-- PAGE: Login (Mobile) -->
+  <div class="page auth-page" data-page="login">
+    <div class="auth-mobile">
+      <div class="mobile-status-bar">
+        <span>9:41</span>
+      </div>
+      <div style="padding:14px 18px">
+        <svg class="icon" style="font-size:20px;cursor:pointer" onclick="goToPage('overview')"><use href="#i-arrow-left"/></svg>
+      </div>
+
+      <div class="auth-mobile-content">
+        <div class="auth-logo-block">
+          <div class="auth-logo">
+            <div class="name">CCCA</div>
+            <div class="tag">加中建筑协会</div>
+          </div>
+          <div class="auth-title">欢迎回来</div>
+          <div class="auth-subtitle">登录您的账户</div>
+        </div>
+
+        <div class="form-field">
+          <label>邮箱或用户名</label>
+          <input type="text" class="form-input" value="sue@example.com"/>
+        </div>
+
+        <div class="form-field">
+          <label>密码</label>
+          <div class="form-input-wrapper">
+            <input type="password" class="form-input" value="••••••••" style="padding-right:44px"/>
+            <span class="form-input-suffix" onclick="showHint('切换密码显示/隐藏')">显示</span>
+          </div>
+        </div>
+
+        <div class="auth-row">
+          <label class="auth-checkbox-label">
+            <input type="checkbox" checked/>
+            记住我
+          </label>
+          <a class="auth-link" onclick="showHint('打开找回密码流程')">忘记密码?</a>
+        </div>
+
+        <button class="auth-submit" onclick="goToPage('overview')">登录</button>
+
+        <div class="auth-switch">
+          还没有账户? <a onclick="goToPage('register')">立即注册</a>
+        </div>
+
+        <div class="auth-guest">
+          <a onclick="showHint('以游客身份浏览,可看黄页/招聘')">以游客身份继续浏览 →</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAGE: Register (Mobile) -->
+  <div class="page auth-page" data-page="register">
+    <div class="auth-mobile">
+      <div class="mobile-status-bar">
+        <span>9:41</span>
+      </div>
+      <div style="padding:14px 18px">
+        <svg class="icon" style="font-size:20px;cursor:pointer" onclick="goToPage('login')"><use href="#i-arrow-left"/></svg>
+      </div>
+
+      <div class="auth-mobile-content">
+        <div class="auth-logo-block" style="margin-bottom:32px">
+          <div class="auth-logo">
+            <div class="name">CCCA</div>
+            <div class="tag">加中建筑协会</div>
+          </div>
+          <div class="auth-title">创建账户</div>
+          <div class="auth-subtitle">免费注册,3 秒搞定</div>
+        </div>
+
+        <div class="form-field">
+          <label>邮箱</label>
+          <input type="email" class="form-input" placeholder="your@email.com"/>
+        </div>
+
+        <div class="form-field">
+          <label>设置密码</label>
+          <input type="password" class="form-input" placeholder="至少 8 位字符"/>
+        </div>
+
+        <div class="form-field" style="margin-bottom:18px">
+          <label>确认密码</label>
+          <input type="password" class="form-input" placeholder="再次输入密码"/>
+        </div>
+
+        <label class="auth-tos">
+          <input type="checkbox"/>
+          <span>我已阅读并同意 <a onclick="showHint('打开用户协议')">用户协议</a> 和 <a onclick="showHint('打开隐私政策')">隐私政策</a></span>
+        </label>
+
+        <button class="auth-submit" onclick="goToPage('overview')">立即注册</button>
+
+        <div class="auth-switch">
+          已有账户? <a onclick="goToPage('login')">立即登录</a>
+        </div>
+
+        <div class="auth-guest">
+          <a onclick="showHint('以游客身份浏览,可看黄页/招聘')">以游客身份继续浏览 →</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAGE: Post New Listing (Mobile) -->
+  <div class="page" data-page="post-listing">
+    <div class="mobile-header">
+      <div class="back">
+        <svg class="icon" style="cursor:pointer" onclick="goToPage('listings')"><use href="#i-arrow-left"/></svg>
+        <span class="title">发布黄页</span>
+      </div>
+    </div>
+
+    <div class="form-info-banner">
+      提交后我们将在 1-2 个工作日内审核。审核通过将通过邮件通知。
+    </div>
+
+    <div class="mobile-content" style="padding:14px">
+
+      <div class="section-label">基本信息</div>
+      <div class="form-section">
+        <div class="form-field-small">
+          <label>商家名称 <span class="required">*</span></label>
+          <input type="text" class="form-input-small" placeholder="例如:Sue 装修工程"/>
+        </div>
+        <div class="form-field-small">
+          <label>行业分类 <span class="required">*</span></label>
+          <select class="form-select-small">
+            <option>请选择行业分类</option>
+            <option>装修建筑</option>
+            <option>建材供应</option>
+            <option>建房开发</option>
+            <option>室内装修</option>
+            <option>水管洁具</option>
+          </select>
+        </div>
+        <div class="form-field-small">
+          <label>所在城市 <span class="required">*</span></label>
+          <select class="form-select-small">
+            <option>请选择城市</option>
+            <option>多伦多</option>
+            <option>万锦</option>
+            <option>列治文山</option>
+            <option>密西沙加</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="section-label">联系方式</div>
+      <div class="form-section">
+        <div class="form-field-small">
+          <label>联系电话 <span class="required">*</span></label>
+          <input type="tel" class="form-input-small" placeholder="416-XXX-XXXX"/>
+        </div>
+        <div class="form-field-small">
+          <label>邮箱</label>
+          <input type="email" class="form-input-small" placeholder="contact@example.com"/>
+        </div>
+        <div class="form-field-small">
+          <label>详细地址</label>
+          <input type="text" class="form-input-small" placeholder="3445 Kennedy Rd, Toronto, ON"/>
+        </div>
+        <div class="form-field-small">
+          <label>网站 (可选)</label>
+          <input type="url" class="form-input-small" placeholder="https://example.com"/>
+        </div>
+      </div>
+
+      <div class="section-label">商家介绍</div>
+      <div class="form-section">
+        <div class="form-field-small">
+          <label>业务介绍 <span class="required">*</span></label>
+          <textarea class="form-textarea-small" rows="4" placeholder="介绍您的业务、服务范围、特色..."></textarea>
+        </div>
+        <div class="form-field-small">
+          <label>商家图片 (最多 5 张)</label>
+          <div class="image-upload-grid">
+            <div class="image-upload-slot" onclick="showHint('选择图片上传')">+ 上传</div>
+            <div class="image-upload-slot" onclick="showHint('选择图片上传')">+ 上传</div>
+            <div class="image-upload-slot" onclick="showHint('选择图片上传')">+ 上传</div>
+          </div>
+          <div class="upload-hint">支持 JPG / PNG · 单张最大 5MB</div>
+        </div>
+      </div>
+
+      <div class="form-footer-mobile">
+        <button class="draft-btn" onclick="showHint('草稿已保存')">存为草稿</button>
+        <button class="submit-btn" onclick="showHint('已提交,等待管理员审核')">提交审核</button>
+      </div>
+      <div class="form-hint-line">公司会员可发布 3 条 · 已用 2/3</div>
+
+    </div>
+  </div>
+
+  <!-- PAGE: Post New Job (Mobile) -->
+  <div class="page" data-page="post-job">
+    <div class="mobile-header">
+      <div class="back">
+        <svg class="icon" style="cursor:pointer" onclick="goToPage('jobs')"><use href="#i-arrow-left"/></svg>
+        <span class="title">发布招聘</span>
+      </div>
+    </div>
+
+    <div class="form-info-banner">
+      招聘信息免费发布,默认有效期 60 天。可付费置顶。
+    </div>
+
+    <div class="mobile-content" style="padding:14px">
+
+      <div class="section-label">职位信息</div>
+      <div class="form-section">
+        <div class="form-field-small">
+          <label>职位名称 <span class="required">*</span></label>
+          <input type="text" class="form-input-small" placeholder="例如:资深室内设计师"/>
+        </div>
+        <div class="form-field-small">
+          <label>公司名称 <span class="required">*</span></label>
+          <input type="text" class="form-input-small" placeholder="例如:Sue 装修工程"/>
+        </div>
+        <div class="form-row-2col">
+          <div>
+            <label style="display:block;font-size:12px;color:var(--gray-600);margin-bottom:6px">工作地点 <span class="required">*</span></label>
+            <select class="form-select-small">
+              <option>多伦多</option>
+              <option>万锦</option>
+              <option>列治文山</option>
+            </select>
+          </div>
+          <div>
+            <label style="display:block;font-size:12px;color:var(--gray-600);margin-bottom:6px">职位类型 <span class="required">*</span></label>
+            <select class="form-select-small">
+              <option>全职</option>
+              <option>兼职</option>
+              <option>合同工</option>
+              <option>实习</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-field-small">
+          <label>薪资范围 (可选)</label>
+          <input type="text" class="form-input-small" placeholder="例如:$60K-80K/年 或 $25-35/小时"/>
+        </div>
+      </div>
+
+      <div class="section-label">职位描述</div>
+      <div class="form-section">
+        <div class="form-field-small">
+          <label>职责描述 <span class="required">*</span></label>
+          <textarea class="form-textarea-small" rows="5" placeholder="工作内容、岗位要求、福利待遇..."></textarea>
+        </div>
+        <div class="form-field-small">
+          <label>技能要求 (可选)</label>
+          <input type="text" class="form-input-small" placeholder="用逗号分隔,如:CAD,3DMax,英语"/>
+        </div>
+      </div>
+
+      <div class="section-label">申请方式</div>
+      <div class="form-section">
+        <div class="form-field-small">
+          <label>接收简历邮箱 <span class="required">*</span></label>
+          <input type="email" class="form-input-small" placeholder="hr@example.com"/>
+        </div>
+        <div class="form-field-small">
+          <label>联系电话 (可选)</label>
+          <input type="tel" class="form-input-small" placeholder="416-XXX-XXXX"/>
+        </div>
+      </div>
+
+      <div class="form-footer-mobile">
+        <button class="draft-btn" onclick="showHint('草稿已保存')">存为草稿</button>
+        <button class="submit-btn" onclick="showHint('招聘已发布,立即上线')">立即发布</button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- PAGE: My Job Applications (Mobile) -->
+  <div class="page" data-page="applications">
+    <div class="mobile-header">
+      <div class="back">
+        <svg class="icon" style="cursor:pointer" onclick="goToPage('overview')"><use href="#i-arrow-left"/></svg>
+        <span class="title">我的工作申请</span>
+      </div>
+    </div>
+
+    <div class="tabs-row">
+      <div class="tab active">全部 (4)</div>
+      <div class="tab">在线 (3)</div>
+      <div class="tab">已过期 (1)</div>
+    </div>
+
+    <div class="mobile-content" style="padding:14px 18px">
+
+      <div class="listing-card">
+        <div class="head">
+          <div style="flex:1">
+            <div class="listing-name">资深室内设计师</div>
+            <div class="listing-meta">Sue 装修工程 · 多伦多 · 全职</div>
+          </div>
+          <span class="status-badge published">在线</span>
+        </div>
+        <div class="listing-footer">
+          <div class="listing-stats">
+            <span><svg class="icon" style="font-size:13px"><use href="#i-calendar"/></svg> 投递于 2026-05-08</span>
+          </div>
+          <div class="listing-actions">
+            <button class="action-btn" onclick="showHint('查看职位详情')">查看职位</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="listing-card">
+        <div class="head">
+          <div style="flex:1">
+            <div class="listing-name">水电安装技工</div>
+            <div class="listing-meta">Sue 装修工程 · 万锦 · 全职</div>
+          </div>
+          <span class="status-badge published">在线</span>
+        </div>
+        <div class="listing-footer">
+          <div class="listing-stats">
+            <span><svg class="icon" style="font-size:13px"><use href="#i-calendar"/></svg> 投递于 2026-05-06</span>
+          </div>
+          <div class="listing-actions">
+            <button class="action-btn" onclick="showHint('查看职位详情')">查看职位</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="listing-card">
+        <div class="head">
+          <div style="flex:1">
+            <div class="listing-name">项目经理</div>
+            <div class="listing-meta">华诚建筑 · 多伦多 · 全职</div>
+          </div>
+          <span class="status-badge published">在线</span>
+        </div>
+        <div class="listing-footer">
+          <div class="listing-stats">
+            <span><svg class="icon" style="font-size:13px"><use href="#i-calendar"/></svg> 投递于 2026-04-22</span>
+          </div>
+          <div class="listing-actions">
+            <button class="action-btn" onclick="showHint('查看职位详情')">查看职位</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="listing-card" style="opacity:0.7">
+        <div class="head">
+          <div style="flex:1">
+            <div class="listing-name">行政助理</div>
+            <div class="listing-meta">东方建材 · 列治文山 · 兼职</div>
+          </div>
+          <span class="status-badge muted">已过期</span>
+        </div>
+        <div class="listing-footer">
+          <div class="listing-stats">
+            <span><svg class="icon" style="font-size:13px"><use href="#i-calendar"/></svg> 投递于 2026-04-15</span>
+          </div>
+          <div class="listing-actions">
+            <button class="action-btn" disabled style="opacity:0.5;cursor:not-allowed">查看职位</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Placeholder pages -->
+  <div class="page" data-page="account-settings">
+    <div class="mobile-header">
+      <div class="back">
+        <svg class="icon" style="cursor:pointer" onclick="goToPage('overview')"><use href="#i-arrow-left"/></svg>
+        <span class="title">账户设置</span>
+      </div>
+    </div>
+    <div class="mobile-content">
+      <div style="text-align:center;padding:60px 20px;color:var(--gray-600)">
+        <svg class="icon" style="font-size:48px;margin-bottom:16px"><use href="#i-tool"/></svg>
+        <div style="font-size:14px;margin-bottom:8px">页面即将完成</div>
+        <div style="font-size:12px">下一批样图将包含此页面</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom navigation -->
+  <div class="mobile-bottom-nav">
+    <div class="nav-item" onclick="showHint('返回 CCCA 首页 (cccaonline.ca)')">
+      <svg class="icon"><use href="#i-home"/></svg>
+      <div class="label">首页</div>
+    </div>
+    <div class="nav-item" onclick="showHint('跳转到新闻动态页面')">
+      <svg class="icon"><use href="#i-news"/></svg>
+      <div class="label">新闻</div>
+    </div>
+    <div class="nav-item" onclick="showHint('跳转到黄页浏览页面')">
+      <svg class="icon"><use href="#i-building-store"/></svg>
+      <div class="label">黄页</div>
+    </div>
+    <div class="nav-item" onclick="showHint('跳转到招聘浏览页面')">
+      <svg class="icon"><use href="#i-briefcase"/></svg>
+      <div class="label">招聘</div>
+    </div>
+    <div class="nav-item active" onclick="goToPage('overview')">
+      <svg class="icon"><use href="#i-user"/></svg>
+      <div class="label">我的账户</div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+
+<!-- ============================================================ -->
+<!-- DESKTOP VIEW                                                   -->
+<!-- ============================================================ -->
+<div class="desktop-view">
+<div class="desktop-frame">
+
+  <div class="desktop-header">
+    <div class="nav-left">
+      <span class="logo">加中建筑协会</span>
+      <span>首页</span>
+      <span>关于我们</span>
+      <span>理事成员</span>
+      <span>新闻动态</span>
+      <span>黄页</span>
+      <span>招聘</span>
+      <span>联系我们</span>
+    </div>
+    <div class="nav-right">
+      <span class="lang">EN | 中</span>
+      <div class="avatar">Sue</div>
+    </div>
+  </div>
+
+  <div class="desktop-body">
+
+    <!-- Sidebar (shared by all desktop pages) -->
+    <div class="desktop-sidebar">
+      <div class="sidebar-user-card">
+        <div class="head">
+          <div class="avatar">Sue</div>
+          <div>
+            <div class="name">Sue</div>
+            <span class="badge">公司会员</span>
+          </div>
+        </div>
+        <div class="expiry">到期: 2027-05-11</div>
+      </div>
+
+      <div class="sidebar-item" id="nav-overview" onclick="goToPage('overview')">
+        <svg class="icon"><use href="#i-dashboard"/></svg>
+        <span>总览</span>
+      </div>
+
+      <div class="sidebar-section-label">商家管理</div>
+      <div class="sidebar-item" id="nav-listings" onclick="goToPage('listings')">
+        <svg class="icon"><use href="#i-building-store"/></svg>
+        <span>黄页管理</span>
+        <span class="badge-count">3</span>
+      </div>
+      <div class="sidebar-item" id="nav-jobs" onclick="goToPage('jobs')">
+        <svg class="icon"><use href="#i-briefcase"/></svg>
+        <span>招聘管理</span>
+        <span class="badge-count">2</span>
+      </div>
+      <div class="sidebar-item" id="nav-ads" onclick="goToPage('ads')">
+        <svg class="icon"><use href="#i-photo"/></svg>
+        <span>广告管理</span>
+        <span class="badge-count">1</span>
+      </div>
+
+      <div class="sidebar-section-label">浏览与互动</div>
+      <div class="sidebar-item" onclick="showHint('点击进入收藏的黄页 (即将完成)')">
+        <svg class="icon"><use href="#i-heart"/></svg>
+        <span>收藏的黄页</span>
+      </div>
+      <div class="sidebar-item" id="nav-applications" onclick="goToPage('applications')">
+        <svg class="icon"><use href="#i-briefcase"/></svg>
+        <span>工作申请</span>
+      </div>
+      <div class="sidebar-item disabled">
+        <svg class="icon"><use href="#i-message-circle"/></svg>
+        <span>我的评论</span>
+      </div>
+      <div class="sidebar-item disabled">
+        <svg class="icon"><use href="#i-star"/></svg>
+        <span>我的评分</span>
+      </div>
+
+      <div class="sidebar-section-label">账户</div>
+      <div class="sidebar-item" id="nav-membership" onclick="goToPage('membership')">
+        <svg class="icon"><use href="#i-id-badge"/></svg>
+        <span>会员中心</span>
+      </div>
+      <div class="sidebar-item" id="nav-orders" onclick="goToPage('orders')">
+        <svg class="icon"><use href="#i-receipt"/></svg>
+        <span>订单与发票</span>
+      </div>
+      <div class="sidebar-item" onclick="goToPage('account-settings')">
+        <svg class="icon"><use href="#i-user-cog"/></svg>
+        <span>账户设置</span>
+      </div>
+      <div class="sidebar-item" onclick="showHint('退出登录')">
+        <svg class="icon"><use href="#i-logout"/></svg>
+        <span>退出登录</span>
+      </div>
+    </div>
+
+    <!-- Main content area -->
+    <div class="desktop-main">
+
+      <!-- PAGE: Overview -->
+      <div class="page active" data-page="overview">
+        <div class="welcome">
+          <div class="greeting">欢迎回来,Sue</div>
+          <div class="date">2026年5月11日 星期一 · 公司会员 · 到期 2027-05-11</div>
+        </div>
+
+        <div class="section-header">
+          <span class="title">我的黄页</span>
+          <span class="more" onclick="goToPage('listings')">查看全部 →</span>
+        </div>
+
+        <div class="listings-table">
+          <div class="listing-row">
+            <div class="icon-box"><svg class="icon"><use href="#i-tools"/></svg></div>
+            <div class="info">
+              <div class="name">Sue 装修工程</div>
+              <div class="meta">装修建筑 · 多伦多</div>
+            </div>
+            <span class="status-badge featured">置顶中</span>
+            <button class="action-btn" disabled style="opacity:0.5;cursor:not-allowed">已置顶</button>
+            <button class="action-btn">编辑</button>
+          </div>
+          <div class="listing-row">
+            <div class="icon-box"><svg class="icon"><use href="#i-home"/></svg></div>
+            <div class="info">
+              <div class="name">Sue 地板专卖</div>
+              <div class="meta">建材 · 万锦</div>
+            </div>
+            <span class="status-badge published">已发布</span>
+            <button class="action-btn primary" onclick="showHint('点击进入购买置顶流程')">置顶</button>
+            <button class="action-btn">编辑</button>
+          </div>
+          <div class="listing-row">
+            <div class="icon-box"><svg class="icon"><use href="#i-paint"/></svg></div>
+            <div class="info">
+              <div class="name">Sue 油漆工程</div>
+              <div class="meta">装修建筑 · 列治文山</div>
+            </div>
+            <span class="status-badge pending">审核中</span>
+            <button class="action-btn" disabled style="opacity:0.5;cursor:not-allowed">置顶</button>
+            <button class="action-btn">编辑</button>
+          </div>
+        </div>
+
+        <div class="bottom-actions">
+          <button class="primary" onclick="goToPage('post-listing')">+ 发布新黄页</button>
+          <button class="secondary" onclick="goToPage('post-job')">+ 发布招聘</button>
+          <button class="secondary" onclick="showHint('点击进入投放广告流程')">+ 投放广告</button>
+        </div>
+      </div>
+
+      <!-- PAGE: Membership Center -->
+      <div class="page" data-page="membership">
+        <div class="welcome">
+          <div class="greeting">会员中心</div>
+          <div class="date">查看您的会员等级、权益和订阅信息</div>
+        </div>
+
+        <div class="membership-banner-desktop">
+          <div>
+            <div class="level-line">
+              <svg class="icon"><use href="#i-id-badge"/></svg>
+              <span class="level">公司会员</span>
+              <span class="status">激活中</span>
+            </div>
+            <div class="expiry-label">到期日</div>
+            <div class="expiry-date">2027 年 5 月 11 日</div>
+            <div class="expiry-info">还剩 365 天 · $99 CAD / 年</div>
+          </div>
+          <button class="renew-btn" onclick="showHint('点击进入续费付款流程')">立即续费</button>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+          <div>
+            <div style="font-size:14px;font-weight:500;margin-bottom:12px">会员权益</div>
+            <div class="detail-card">
+              <div class="detail-row">
+                <div class="left"><svg class="icon"><use href="#i-circle-check"/></svg><span class="label">发布黄页</span></div>
+                <span class="value">3 / 3 已用</span>
+              </div>
+              <div class="detail-row">
+                <div class="left"><svg class="icon"><use href="#i-circle-check"/></svg><span class="label">发布招聘信息</span></div>
+                <span class="value">不限</span>
+              </div>
+              <div class="detail-row">
+                <div class="left"><svg class="icon"><use href="#i-circle-check"/></svg><span class="label">投放广告资格</span></div>
+                <span class="value">可投放</span>
+              </div>
+              <div class="detail-row">
+                <div class="left"><svg class="icon"><use href="#i-circle-check"/></svg><span class="label">公司会员标识</span></div>
+                <span class="value">已启用</span>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div style="font-size:14px;font-weight:500;margin-bottom:12px">订阅信息</div>
+            <div class="detail-card">
+              <div class="detail-row">
+                <span class="label-secondary">开通日期</span>
+                <span class="value-bold">2026-05-11</span>
+              </div>
+              <div class="detail-row">
+                <span class="label-secondary">自动续费</span>
+                <div style="display:flex;align-items:center;gap:8px">
+                  <span style="font-size:13px;color:var(--red);font-weight:500">已开启</span>
+                  <div class="toggle-switch"></div>
+                </div>
+              </div>
+              <div class="detail-row">
+                <span class="label-secondary">支付方式</span>
+                <div style="display:flex;align-items:center;gap:6px">
+                  <svg class="icon" style="font-size:16px"><use href="#i-credit-card"/></svg>
+                  <span class="value-bold">**** 4242</span>
+                </div>
+              </div>
+            </div>
+            <button class="btn-outline-cancel" onclick="showHint('点击取消自动续费')">取消自动续费</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- PAGE: Listings Management (Desktop) -->
+      <div class="page" data-page="listings">
+        <div class="page-header-with-action">
+          <div class="left">
+            <div class="title">黄页管理</div>
+            <div class="subtitle">公司会员可发布 3 条 · 已用 3/3</div>
+          </div>
+          <button style="background:var(--red);border:none;color:white;padding:11px 22px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer" onclick="goToPage('post-listing')">+ 发布新黄页</button>
+        </div>
+
+        <div class="tabs-row-desktop">
+          <div class="tab active">全部 (3)</div>
+          <div class="tab">已发布 (2)</div>
+          <div class="tab">审核中 (1)</div>
+          <div class="tab">草稿</div>
+        </div>
+
+        <div style="display:flex;flex-direction:column">
+
+          <!-- Listing 1 -->
+          <div class="listing-card-desktop">
+            <div class="icon-big"><svg class="icon"><use href="#i-tools"/></svg></div>
+            <div class="body">
+              <div class="name-line">
+                <span class="name-text">Sue 装修工程</span>
+                <span class="status-badge featured">置顶中</span>
+              </div>
+              <div class="meta-line">装修建筑 · 多伦多</div>
+              <div class="stats-line">
+                <span><svg class="icon" style="font-size:13px"><use href="#i-eye"/></svg> 487 浏览</span>
+                <span><svg class="icon" style="font-size:13px"><use href="#i-calendar"/></svg> 2026-01-08 发布</span>
+              </div>
+            </div>
+            <div class="right-actions">
+              <button class="action-btn" disabled style="opacity:0.5;cursor:not-allowed">已置顶</button>
+              <button class="action-btn" onclick="showHint('打开编辑表单')">编辑</button>
+              <button class="action-btn" onclick="showHint('查看黄页详情页')">查看</button>
+            </div>
+          </div>
+
+          <!-- Listing 2 -->
+          <div class="listing-card-desktop">
+            <div class="icon-big"><svg class="icon"><use href="#i-home"/></svg></div>
+            <div class="body">
+              <div class="name-line">
+                <span class="name-text">Sue 地板专卖</span>
+                <span class="status-badge published">已发布</span>
+              </div>
+              <div class="meta-line">建材 · 万锦</div>
+              <div class="stats-line">
+                <span><svg class="icon" style="font-size:13px"><use href="#i-eye"/></svg> 312 浏览</span>
+                <span><svg class="icon" style="font-size:13px"><use href="#i-calendar"/></svg> 2026-02-15 发布</span>
+              </div>
+            </div>
+            <div class="right-actions">
+              <button class="action-btn primary" onclick="showHint('点击进入购买置顶流程 ($29/30天)')">置顶</button>
+              <button class="action-btn" onclick="showHint('打开编辑表单')">编辑</button>
+              <button class="action-btn" onclick="showHint('查看黄页详情')">查看</button>
+            </div>
+          </div>
+
+          <!-- Listing 3 -->
+          <div class="listing-card-desktop">
+            <div class="icon-big"><svg class="icon"><use href="#i-paint"/></svg></div>
+            <div class="body">
+              <div class="name-line">
+                <span class="name-text">Sue 油漆工程</span>
+                <span class="status-badge pending">审核中</span>
+              </div>
+              <div class="meta-line">装修建筑 · 列治文山 · 提交于 2026-05-10</div>
+              <div class="stats-line">
+                <span style="color:var(--amber-text)"><svg class="icon" style="font-size:13px"><use href="#i-info-circle"/></svg> 通常 1-2 个工作日内审核完成</span>
+              </div>
+            </div>
+            <div class="right-actions">
+              <button class="action-btn" disabled style="opacity:0.5;cursor:not-allowed">置顶</button>
+              <button class="action-btn" onclick="showHint('打开编辑表单')">编辑</button>
+              <button class="action-btn" style="border-color:var(--red);color:var(--red)" onclick="showHint('确认要撤回这条黄页吗?')">撤回</button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- PAGE: Jobs Management (Desktop) -->
+      <div class="page" data-page="jobs">
+        <div class="page-header-with-action">
+          <div class="left">
+            <div class="title">招聘管理</div>
+            <div class="subtitle">公司会员可发布不限数量职位 · 共收到 5 份申请</div>
+          </div>
+          <button style="background:var(--red);border:none;color:white;padding:11px 22px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer" onclick="goToPage('post-job')">+ 发布新职位</button>
+        </div>
+
+        <div class="tabs-row-desktop">
+          <div class="tab active">在线 (2)</div>
+          <div class="tab">已过期 (1)</div>
+          <div class="tab">草稿</div>
+        </div>
+
+        <!-- Job 1 -->
+        <div class="listing-card-desktop">
+          <div class="icon-big"><svg class="icon"><use href="#i-briefcase"/></svg></div>
+          <div class="body">
+            <div class="name-line">
+              <span class="name-text">资深室内设计师</span>
+              <span class="status-badge published">在线</span>
+            </div>
+            <div class="meta-line">Sue 装修工程 · 多伦多 · 全职 · CAD $60K-80K/年</div>
+            <div class="stats-line">
+              <span><svg class="icon" style="font-size:13px"><use href="#i-user"/></svg> 7 份申请 (3 新)</span>
+              <span><svg class="icon" style="font-size:13px"><use href="#i-calendar"/></svg> 发布于 2026-04-12</span>
+              <span><svg class="icon" style="font-size:13px"><use href="#i-clock"/></svg> 到期 2026-06-12</span>
+              <span><svg class="icon" style="font-size:13px"><use href="#i-eye"/></svg> 142 次浏览</span>
+            </div>
+          </div>
+          <div class="right-actions">
+            <button class="action-btn primary" onclick="showHint('查看求职申请列表')">查看申请</button>
+            <button class="action-btn" onclick="showHint('打开编辑表单')">编辑</button>
+            <button class="action-btn" onclick="showHint('标记为已招满')">已招满</button>
+          </div>
+        </div>
+
+        <!-- Job 2 -->
+        <div class="listing-card-desktop">
+          <div class="icon-big"><svg class="icon"><use href="#i-briefcase"/></svg></div>
+          <div class="body">
+            <div class="name-line">
+              <span class="name-text">水电安装技工</span>
+              <span class="status-badge published">在线</span>
+            </div>
+            <div class="meta-line">Sue 装修工程 · 万锦 · 全职 · CAD $25-35/小时</div>
+            <div class="stats-line">
+              <span><svg class="icon" style="font-size:13px"><use href="#i-user"/></svg> 2 份申请</span>
+              <span><svg class="icon" style="font-size:13px"><use href="#i-calendar"/></svg> 发布于 2026-03-28</span>
+              <span><svg class="icon" style="font-size:13px"><use href="#i-clock"/></svg> 到期 2026-05-28</span>
+              <span><svg class="icon" style="font-size:13px"><use href="#i-eye"/></svg> 89 次浏览</span>
+            </div>
+          </div>
+          <div class="right-actions">
+            <button class="action-btn" onclick="showHint('查看求职申请列表')">查看申请</button>
+            <button class="action-btn" onclick="showHint('打开编辑表单')">编辑</button>
+            <button class="action-btn" onclick="showHint('标记为已招满')">已招满</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- PAGE: Orders (Desktop) -->
+      <div class="page" data-page="orders">
+        <div class="welcome">
+          <div class="greeting">订单与发票</div>
+          <div class="date">所有付款记录可在此查看并下载发票</div>
+        </div>
+
+        <div class="stats-grid" style="grid-template-columns:repeat(2,1fr)">
+          <div class="stat-card">
+            <div class="label">本年累计消费</div>
+            <div class="value" style="color:var(--red)">$148.00</div>
+          </div>
+          <div class="stat-card">
+            <div class="label">订单数量</div>
+            <div class="value">3</div>
+          </div>
+        </div>
+
+        <div class="tabs-row-desktop">
+          <div class="tab active">全部 (3)</div>
+          <div class="tab">已完成 (3)</div>
+        </div>
+
+        <div class="orders-table">
+          <div class="row-header">
+            <div>订单号</div>
+            <div>项目</div>
+            <div style="text-align:right">金额</div>
+            <div>日期</div>
+            <div>状态</div>
+            <div style="text-align:right">操作</div>
+          </div>
+
+          <div class="row-data">
+            <div class="col-order-no">#CCCA-2026-0512</div>
+            <div>
+              <div style="color:var(--gray-900)">黄页置顶 30 天</div>
+              <div style="font-size:10px;color:var(--gray-600);margin-top:2px">Sue 装修工程</div>
+            </div>
+            <div class="col-price">$29.00</div>
+            <div style="color:var(--gray-600)">2026-05-11</div>
+            <div><span class="status-badge published">已完成</span></div>
+            <div class="col-actions">
+              <button class="action-btn" onclick="showHint('下载 PDF 发票')">下载发票</button>
+            </div>
+          </div>
+
+          <div class="row-data">
+            <div class="col-order-no">#CCCA-2026-0398</div>
+            <div>
+              <div style="color:var(--gray-900)">侧栏广告 1 个月</div>
+              <div style="font-size:10px;color:var(--gray-600);margin-top:2px">2026-04-15 至 2026-05-15</div>
+            </div>
+            <div class="col-price">$99.00</div>
+            <div style="color:var(--gray-600)">2026-04-15</div>
+            <div><span class="status-badge published">已完成</span></div>
+            <div class="col-actions">
+              <button class="action-btn" onclick="showHint('下载 PDF 发票')">下载发票</button>
+            </div>
+          </div>
+
+          <div class="row-data">
+            <div class="col-order-no">#CCCA-2026-0201</div>
+            <div>
+              <div style="color:var(--gray-900)">公司会员年费</div>
+              <div style="font-size:10px;color:var(--gray-600);margin-top:2px">2026-02-11 至 2027-02-11</div>
+            </div>
+            <div class="col-price">$20.00</div>
+            <div style="color:var(--gray-600)">2026-02-11</div>
+            <div><span class="status-badge published">已完成</span></div>
+            <div class="col-actions">
+              <button class="action-btn" onclick="showHint('下载 PDF 发票')">下载发票</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PAGE: Ads Management (Desktop) -->
+      <div class="page" data-page="ads">
+        <div class="page-header-with-action">
+          <div class="left">
+            <div class="title">广告管理</div>
+            <div class="subtitle">侧栏广告 $99/月 · 600×300 横版 · 仅公司会员可投放</div>
+          </div>
+          <button style="background:var(--red);border:none;color:white;padding:11px 22px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer" onclick="showHint('打开投放新广告申请表单(填写信息+上传素材,管理员审核后上线)')">+ 申请投放新广告</button>
+        </div>
+
+        <div style="background:var(--red-light);padding:12px 16px;border-radius:8px;margin-bottom:18px;font-size:12px;color:var(--gray-900);line-height:1.5">
+          广告素材由管理员审核后手动上线 · 如需更换素材或申请续期请使用下方按钮联系协会
+        </div>
+
+        <div class="tabs-row-desktop">
+          <div class="tab active">投放中 (1)</div>
+          <div class="tab">已结束 (2)</div>
+        </div>
+
+        <div class="ad-card-desktop">
+          <div>
+            <div class="ad-preview-desktop">广告素材预览 600×300</div>
+
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+              <span style="font-size:15px;font-weight:500;color:var(--gray-900)">侧栏广告 - 装修服务</span>
+              <span class="status-badge published">投放中</span>
+            </div>
+            <div style="font-size:12px;color:var(--gray-600);margin-bottom:14px">600×300 横版 · 所有页面侧栏 · 链接至 sue-decoration.com</div>
+
+            <div class="ad-meta-row" style="padding-top:0;border-top:none">
+              <span>投放期间 2026-04-15 至 2026-05-15</span>
+              <span>剩余 4 天</span>
+              <span>已花费 $99.00</span>
+            </div>
+          </div>
+
+          <div class="ad-actions-desktop">
+            <button class="action-btn primary" onclick="showHint('提交续期申请,管理员将延长广告期 1 个月')">申请续期</button>
+            <button class="action-btn" onclick="showHint('打开邮件给管理员发送新素材')">联系更换素材</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- PAGE: Post New Listing (Desktop) -->
+      <div class="page" data-page="post-listing">
+        <div class="back-link" onclick="goToPage('listings')">← 返回黄页管理</div>
+        <div class="welcome">
+          <div class="greeting">发布新黄页</div>
+          <div class="date">提交后将在 1-2 个工作日内审核 · 公司会员可发布 3 条,已用 2/3</div>
+        </div>
+
+        <div class="form-main-with-sidebar">
+
+          <div style="display:flex;flex-direction:column;gap:14px">
+
+            <div class="form-section">
+              <div class="section-title">基本信息</div>
+              <div class="form-field-small">
+                <label>商家名称 <span class="required">*</span></label>
+                <input type="text" class="form-input-small" placeholder="例如:Sue 装修工程"/>
+              </div>
+              <div class="form-row-2col" style="margin-bottom:0">
+                <div>
+                  <label style="display:block;font-size:12px;color:var(--gray-600);margin-bottom:6px">行业分类 <span class="required">*</span></label>
+                  <select class="form-select-small">
+                    <option>装修建筑</option>
+                    <option>建材供应</option>
+                    <option>建房开发</option>
+                    <option>水管洁具</option>
+                  </select>
+                </div>
+                <div>
+                  <label style="display:block;font-size:12px;color:var(--gray-600);margin-bottom:6px">所在城市 <span class="required">*</span></label>
+                  <select class="form-select-small">
+                    <option>多伦多</option>
+                    <option>万锦</option>
+                    <option>列治文山</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-section">
+              <div class="section-title">联系方式</div>
+              <div class="form-row-2col">
+                <div>
+                  <label style="display:block;font-size:12px;color:var(--gray-600);margin-bottom:6px">联系电话 <span class="required">*</span></label>
+                  <input type="tel" class="form-input-small" placeholder="416-XXX-XXXX"/>
+                </div>
+                <div>
+                  <label style="display:block;font-size:12px;color:var(--gray-600);margin-bottom:6px">邮箱</label>
+                  <input type="email" class="form-input-small" placeholder="contact@example.com"/>
+                </div>
+              </div>
+              <div class="form-field-small">
+                <label>详细地址</label>
+                <input type="text" class="form-input-small" placeholder="3445 Kennedy Rd, Toronto, ON"/>
+              </div>
+              <div class="form-field-small" style="margin-bottom:0">
+                <label>网站 (可选)</label>
+                <input type="url" class="form-input-small" placeholder="https://example.com"/>
+              </div>
+            </div>
+
+            <div class="form-section">
+              <div class="section-title">商家介绍</div>
+              <div class="form-field-small">
+                <label>业务介绍 <span class="required">*</span></label>
+                <textarea class="form-textarea-small" rows="5" placeholder="介绍您的业务、服务范围、特色..."></textarea>
+              </div>
+              <div class="form-field-small" style="margin-bottom:0">
+                <label>商家图片 (最多 5 张)</label>
+                <div class="image-upload-grid cols-5">
+                  <div class="image-upload-slot" onclick="showHint('选择图片上传')">+ 上传</div>
+                  <div class="image-upload-slot" onclick="showHint('选择图片上传')">+ 上传</div>
+                  <div class="image-upload-slot" onclick="showHint('选择图片上传')">+ 上传</div>
+                  <div class="image-upload-slot" onclick="showHint('选择图片上传')">+ 上传</div>
+                  <div class="image-upload-slot" onclick="showHint('选择图片上传')">+ 上传</div>
+                </div>
+                <div class="upload-hint">支持 JPG / PNG · 单张最大 5MB</div>
+              </div>
+            </div>
+
+          </div>
+
+          <div>
+            <div class="form-side-card">
+              <div class="title">提交说明</div>
+              <div class="info-block">
+                • 提交后 1-2 个工作日审核<br>
+                • 审核通过将邮件通知<br>
+                • 通过后可购买置顶服务<br>
+                • 公司会员限发 3 条
+              </div>
+              <div class="helper-text">
+                带 <span class="required">*</span> 为必填项。<br>
+                完善信息有助于客户找到您。
+              </div>
+              <button class="submit-btn" onclick="showHint('已提交,等待管理员审核')">提交审核</button>
+              <button class="draft-btn" onclick="showHint('草稿已保存')">存为草稿</button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- PAGE: Post New Job (Desktop) -->
+      <div class="page" data-page="post-job">
+        <div class="back-link" onclick="goToPage('jobs')">← 返回招聘管理</div>
+        <div class="welcome">
+          <div class="greeting">发布新职位</div>
+          <div class="date">招聘信息免费发布 · 默认有效期 60 天 · 公司会员不限数量</div>
+        </div>
+
+        <div class="form-main-with-sidebar">
+
+          <div style="display:flex;flex-direction:column;gap:14px">
+
+            <div class="form-section">
+              <div class="section-title">职位信息</div>
+              <div class="form-row-2col">
+                <div>
+                  <label style="display:block;font-size:12px;color:var(--gray-600);margin-bottom:6px">职位名称 <span class="required">*</span></label>
+                  <input type="text" class="form-input-small" placeholder="例如:资深室内设计师"/>
+                </div>
+                <div>
+                  <label style="display:block;font-size:12px;color:var(--gray-600);margin-bottom:6px">公司名称 <span class="required">*</span></label>
+                  <input type="text" class="form-input-small" placeholder="Sue 装修工程"/>
+                </div>
+              </div>
+              <div class="form-row-3col">
+                <div>
+                  <label style="display:block;font-size:12px;color:var(--gray-600);margin-bottom:6px">工作地点 <span class="required">*</span></label>
+                  <select class="form-select-small">
+                    <option>多伦多</option>
+                    <option>万锦</option>
+                    <option>列治文山</option>
+                  </select>
+                </div>
+                <div>
+                  <label style="display:block;font-size:12px;color:var(--gray-600);margin-bottom:6px">职位类型 <span class="required">*</span></label>
+                  <select class="form-select-small">
+                    <option>全职</option>
+                    <option>兼职</option>
+                    <option>合同工</option>
+                    <option>实习</option>
+                  </select>
+                </div>
+                <div>
+                  <label style="display:block;font-size:12px;color:var(--gray-600);margin-bottom:6px">薪资范围</label>
+                  <input type="text" class="form-input-small" placeholder="$60K-80K/年"/>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-section">
+              <div class="section-title">职位描述</div>
+              <div class="form-field-small">
+                <label>职责描述 <span class="required">*</span></label>
+                <textarea class="form-textarea-small" rows="6" placeholder="工作内容、岗位要求、福利待遇..."></textarea>
+              </div>
+              <div class="form-field-small" style="margin-bottom:0">
+                <label>技能要求 (可选)</label>
+                <input type="text" class="form-input-small" placeholder="用逗号分隔,如:CAD,3DMax,英语"/>
+              </div>
+            </div>
+
+            <div class="form-section">
+              <div class="section-title">申请方式</div>
+              <div class="form-row-2col" style="margin-bottom:0">
+                <div>
+                  <label style="display:block;font-size:12px;color:var(--gray-600);margin-bottom:6px">接收简历邮箱 <span class="required">*</span></label>
+                  <input type="email" class="form-input-small" placeholder="hr@example.com"/>
+                </div>
+                <div>
+                  <label style="display:block;font-size:12px;color:var(--gray-600);margin-bottom:6px">联系电话 (可选)</label>
+                  <input type="tel" class="form-input-small" placeholder="416-XXX-XXXX"/>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <div>
+            <div class="form-side-card">
+              <div class="title">发布说明</div>
+              <div class="info-block">
+                • 招聘信息发布免费<br>
+                • 默认有效期 60 天<br>
+                • 求职申请发送到您的邮箱<br>
+                • 付费置顶 $20 / 14 天
+              </div>
+              <div class="helper-text">
+                带 <span class="required">*</span> 为必填项。<br>
+                描述越详细,申请者越多。
+              </div>
+              <button class="submit-btn" onclick="showHint('招聘已发布,立即上线')">立即发布</button>
+              <button class="draft-btn" onclick="showHint('草稿已保存')">存为草稿</button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- PAGE: My Job Applications (Desktop) -->
+      <div class="page" data-page="applications">
+        <div class="welcome">
+          <div class="greeting">我的工作申请</div>
+          <div class="date">查看您投递过的所有职位</div>
+        </div>
+
+        <div class="tabs-row-desktop">
+          <div class="tab active">全部 (4)</div>
+          <div class="tab">在线 (3)</div>
+          <div class="tab">已过期 (1)</div>
+        </div>
+
+        <div style="display:flex;flex-direction:column">
+
+          <div class="listing-card-desktop">
+            <div class="icon-big"><svg class="icon"><use href="#i-briefcase"/></svg></div>
+            <div class="body">
+              <div class="name-line">
+                <span class="name-text">资深室内设计师</span>
+                <span class="status-badge published">在线</span>
+              </div>
+              <div class="meta-line">Sue 装修工程 · 多伦多 · 全职 · CAD $60K-80K/年</div>
+              <div class="stats-line">
+                <span><svg class="icon" style="font-size:13px"><use href="#i-calendar"/></svg> 投递于 2026-05-08</span>
+              </div>
+            </div>
+            <div class="right-actions">
+              <button class="action-btn" onclick="showHint('查看职位详情')">查看职位</button>
+            </div>
+          </div>
+
+          <div class="listing-card-desktop">
+            <div class="icon-big"><svg class="icon"><use href="#i-briefcase"/></svg></div>
+            <div class="body">
+              <div class="name-line">
+                <span class="name-text">水电安装技工</span>
+                <span class="status-badge published">在线</span>
+              </div>
+              <div class="meta-line">Sue 装修工程 · 万锦 · 全职 · CAD $25-35/小时</div>
+              <div class="stats-line">
+                <span><svg class="icon" style="font-size:13px"><use href="#i-calendar"/></svg> 投递于 2026-05-06</span>
+              </div>
+            </div>
+            <div class="right-actions">
+              <button class="action-btn" onclick="showHint('查看职位详情')">查看职位</button>
+            </div>
+          </div>
+
+          <div class="listing-card-desktop">
+            <div class="icon-big"><svg class="icon"><use href="#i-briefcase"/></svg></div>
+            <div class="body">
+              <div class="name-line">
+                <span class="name-text">项目经理</span>
+                <span class="status-badge published">在线</span>
+              </div>
+              <div class="meta-line">华诚建筑 · 多伦多 · 全职 · CAD $70K-90K/年</div>
+              <div class="stats-line">
+                <span><svg class="icon" style="font-size:13px"><use href="#i-calendar"/></svg> 投递于 2026-04-22</span>
+              </div>
+            </div>
+            <div class="right-actions">
+              <button class="action-btn" onclick="showHint('查看职位详情')">查看职位</button>
+            </div>
+          </div>
+
+          <div class="listing-card-desktop" style="opacity:0.7">
+            <div class="icon-big"><svg class="icon"><use href="#i-briefcase"/></svg></div>
+            <div class="body">
+              <div class="name-line">
+                <span class="name-text">行政助理</span>
+                <span class="status-badge muted">已过期</span>
+              </div>
+              <div class="meta-line">东方建材 · 列治文山 · 兼职 · 该职位已下线</div>
+              <div class="stats-line">
+                <span><svg class="icon" style="font-size:13px"><use href="#i-calendar"/></svg> 投递于 2026-04-15</span>
+              </div>
+            </div>
+            <div class="right-actions">
+              <button class="action-btn" disabled style="opacity:0.5;cursor:not-allowed">查看职位</button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- PAGE: Account Settings (placeholder) -->
+      <div class="page" data-page="account-settings">
+        <div class="welcome">
+          <div class="greeting">账户设置</div>
+          <div class="date">页面即将完成</div>
+        </div>
+        <div style="text-align:center;padding:80px 20px;color:var(--gray-600)">
+          <svg class="icon" style="font-size:64px;margin-bottom:16px"><use href="#i-tool"/></svg>
+          <div style="font-size:16px;margin-bottom:8px">页面即将完成</div>
+          <div style="font-size:13px">下一批样图将包含此页面</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- Desktop auth pages (independent, full-width, no sidebar) -->
+<div class="desktop-view">
+
+  <!-- PAGE: Login (Desktop) -->
+  <div class="page auth-page" data-page="login">
+    <div style="background:#F5F1E8;border-radius:var(--border-radius-lg);padding:1rem;border:0.5px solid #E5E5E5;max-width:1200px;margin:0 auto;">
+      <div class="auth-page-header">
+        <div style="display:flex;align-items:center;gap:24px">
+          <span style="font-size:16px;font-weight:500;color:var(--red);cursor:pointer" onclick="goToPage('overview')">加中建筑协会</span>
+          <span style="font-size:13px;cursor:pointer">首页</span>
+          <span style="font-size:13px;cursor:pointer">关于我们</span>
+          <span style="font-size:13px;cursor:pointer">理事成员</span>
+          <span style="font-size:13px;cursor:pointer">新闻动态</span>
+          <span style="font-size:13px;cursor:pointer">黄页</span>
+          <span style="font-size:13px;cursor:pointer">招聘</span>
+          <span style="font-size:13px;cursor:pointer">联系我们</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:14px">
+          <span style="font-size:12px;color:var(--gray-600)">EN | 中</span>
+        </div>
+      </div>
+
+      <div class="auth-desktop">
+        <div class="auth-hero">
+          <div class="brand-mark">CCCA · 加中建筑协会</div>
+          <div class="headline">连接建筑行业<br>共创美好未来</div>
+          <div class="desc">登录账户后您可以发布黄页商家、招聘信息,管理广告投放,并与行业同仁建立联系。</div>
+          <div class="features">
+            <div class="feature-stat">· 261+ 黄页商家</div>
+            <div class="feature-stat">· 200+ 协会会员企业</div>
+            <div class="feature-stat">· 5+ 加拿大主要城市覆盖</div>
+          </div>
+        </div>
+
+        <div class="auth-form">
+          <div class="form-title">欢迎回来</div>
+          <div class="form-subtitle">登录您的账户</div>
+
+          <div class="form-field">
+            <label>邮箱或用户名</label>
+            <input type="text" class="form-input" value="sue@example.com"/>
+          </div>
+
+          <div class="form-field">
+            <label>密码</label>
+            <div class="form-input-wrapper">
+              <input type="password" class="form-input" value="••••••••" style="padding-right:50px"/>
+              <span class="form-input-suffix" onclick="showHint('切换密码显示/隐藏')">显示</span>
+            </div>
+          </div>
+
+          <div class="auth-row">
+            <label class="auth-checkbox-label">
+              <input type="checkbox" checked/>
+              记住我
+            </label>
+            <a class="auth-link" onclick="showHint('打开找回密码流程')">忘记密码?</a>
+          </div>
+
+          <button class="auth-submit" onclick="goToPage('overview')">登录</button>
+
+          <div class="auth-switch">
+            还没有账户? <a onclick="goToPage('register')">立即注册</a>
+          </div>
+
+          <div class="auth-guest" style="margin-top:0">
+            <a onclick="showHint('以游客身份浏览,可看黄页/招聘')">以游客身份继续浏览 →</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAGE: Register (Desktop) -->
+  <div class="page auth-page" data-page="register">
+    <div style="background:#F5F1E8;border-radius:var(--border-radius-lg);padding:1rem;border:0.5px solid #E5E5E5;max-width:1200px;margin:0 auto;">
+      <div class="auth-page-header">
+        <div style="display:flex;align-items:center;gap:24px">
+          <span style="font-size:16px;font-weight:500;color:var(--red);cursor:pointer" onclick="goToPage('overview')">加中建筑协会</span>
+          <span style="font-size:13px;cursor:pointer">首页</span>
+          <span style="font-size:13px;cursor:pointer">关于我们</span>
+          <span style="font-size:13px;cursor:pointer">理事成员</span>
+          <span style="font-size:13px;cursor:pointer">新闻动态</span>
+          <span style="font-size:13px;cursor:pointer">黄页</span>
+          <span style="font-size:13px;cursor:pointer">招聘</span>
+          <span style="font-size:13px;cursor:pointer">联系我们</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:14px">
+          <span style="font-size:12px;color:var(--gray-600)">EN | 中</span>
+          <button class="login-btn" onclick="goToPage('login')">登录</button>
+        </div>
+      </div>
+
+      <div class="auth-desktop">
+        <div class="auth-hero">
+          <div class="brand-mark">CCCA · 加中建筑协会</div>
+          <div class="headline">加入华人建筑社区</div>
+          <div class="desc">注册后您可以收藏喜欢的商家、推荐口碑服务、申请招聘职位,并享受未来更多专属功能。</div>
+          <div class="features">
+            <div>✓ &nbsp; 浏览所有黄页商家</div>
+            <div>✓ &nbsp; 申请招聘职位</div>
+            <div>✓ &nbsp; 收藏喜欢的商家</div>
+            <div>✓ &nbsp; 升级公司会员可发布黄页</div>
+          </div>
+        </div>
+
+        <div class="auth-form">
+          <div class="form-title">创建账户</div>
+          <div class="form-subtitle">免费注册,3 秒搞定</div>
+
+          <div class="form-field">
+            <label>邮箱</label>
+            <input type="email" class="form-input" placeholder="your@email.com"/>
+          </div>
+
+          <div class="form-field">
+            <label>设置密码</label>
+            <input type="password" class="form-input" placeholder="至少 8 位字符"/>
+          </div>
+
+          <div class="form-field" style="margin-bottom:18px">
+            <label>确认密码</label>
+            <input type="password" class="form-input" placeholder="再次输入密码"/>
+          </div>
+
+          <label class="auth-tos">
+            <input type="checkbox"/>
+            <span>我已阅读并同意 <a onclick="showHint('打开用户协议')">用户协议</a> 和 <a onclick="showHint('打开隐私政策')">隐私政策</a></span>
+          </label>
+
+          <button class="auth-submit" onclick="goToPage('overview')">立即注册</button>
+
+          <div class="auth-switch">
+            已有账户? <a onclick="goToPage('login')">立即登录</a>
+          </div>
+
+          <div class="auth-guest" style="margin-top:0">
+            <a onclick="showHint('以游客身份浏览,可看黄页/招聘')">以游客身份继续浏览 →</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+function showHint(msg) {
+  const hint = document.getElementById('hint');
+  hint.textContent = msg;
+  hint.classList.add('show');
+  clearTimeout(window.__hintTimer);
+  window.__hintTimer = setTimeout(() => hint.classList.remove('show'), 2200);
+}
+
+function goToPage(pageName) {
+  // Hide all pages in both mobile and desktop views
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  // Show target page in both views
+  document.querySelectorAll('.page[data-page="' + pageName + '"]').forEach(p => p.classList.add('active'));
+  
+  // Toggle mobile frame layout: auth pages hide status bar, header, bottom nav
+  const isAuthPage = (pageName === 'login' || pageName === 'register');
+  document.querySelectorAll('.mobile-frame').forEach(f => {
+    if (isAuthPage) f.classList.add('on-auth');
+    else f.classList.remove('on-auth');
+  });
+  // Toggle desktop layout: auth pages hide main frame
+  if (isAuthPage) document.body.classList.add('on-auth');
+  else document.body.classList.remove('on-auth');
+  
+  // Update sidebar active state on desktop
+  document.querySelectorAll('.sidebar-item').forEach(item => item.classList.remove('active'));
+  const navItem = document.getElementById('nav-' + pageName);
+  if (navItem) navItem.classList.add('active');
+  
+  // Scroll to top
+  window.scrollTo({top: 0, behavior: 'smooth'});
+}
+
+function setView(mode) {
+  document.body.classList.remove('force-mobile', 'force-desktop');
+  document.getElementById('btn-mobile').classList.remove('active');
+  document.getElementById('btn-desktop').classList.remove('active');
+  document.getElementById('btn-auto').classList.remove('active');
+  
+  if (mode === 'mobile') {
+    document.body.classList.add('force-mobile');
+    document.getElementById('btn-mobile').classList.add('active');
+  } else if (mode === 'desktop') {
+    document.body.classList.add('force-desktop');
+    document.getElementById('btn-desktop').classList.add('active');
+  } else {
+    document.getElementById('btn-auto').classList.add('active');
+  }
+}
+
+// Initialize
+window.addEventListener('DOMContentLoaded', () => {
+  // Set first page active on desktop
+  const overviewSidebar = document.getElementById('nav-overview');
+  if (overviewSidebar) overviewSidebar.classList.add('active');
+  
+  setTimeout(() => showHint('欢迎!这是 CCCA 个人中心 prototype'), 500);
+});
+</script>
+
+</body>
+</html>
